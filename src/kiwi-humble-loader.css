@@ -1,0 +1,135 @@
+.kh-loader {
+  --kh-loader-size: 160px;
+  display: inline-grid;
+  place-items: center;
+  inline-size: var(--kh-loader-size);
+  block-size: var(--kh-loader-size);
+  color: #182d5b;
+  vertical-align: middle;
+}
+
+.kh-loader__lottie,
+.kh-loader-svg {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.kh-loader__sr {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.kh-badge {
+  fill: #182d5b;
+  transform-origin: 60px 60px;
+  animation: kh-badge-pulse 2s cubic-bezier(.34, 1.56, .64, 1) infinite;
+}
+
+.kh-top-lettering,
+.kh-white,
+.kh-wordmark {
+  fill: #fff;
+}
+
+.kh-gold,
+.kh-spark {
+  fill: #f0a624;
+}
+
+.kh-orange {
+  fill: #d86b1b;
+}
+
+.kh-brown {
+  fill: #572a14;
+}
+
+.kh-green {
+  fill: #459e3a;
+}
+
+.kh-ink {
+  fill: #162e5c;
+}
+
+.kh-mascot {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: kh-mascot-bounce 2s cubic-bezier(.34, 1.56, .64, 1) infinite;
+}
+
+.kh-eyes {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: kh-eye-blink 2s steps(1, end) infinite;
+}
+
+.kh-spark {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: kh-spark-pop 2s ease-in-out infinite;
+}
+
+.kh-spark-right {
+  animation-delay: .14s;
+}
+
+@keyframes kh-badge-pulse {
+  0%, 100% { transform: scale(1); }
+  24% { transform: scale(1.035); }
+  48% { transform: scale(.99); }
+  74% { transform: scale(1.02); }
+}
+
+@keyframes kh-mascot-bounce {
+  0%, 100% { transform: translateY(0) rotate(-2deg) scale(1); }
+  18% { transform: translateY(-9px) rotate(2deg) scale(.96, 1.06); }
+  33% { transform: translateY(4px) rotate(-1deg) scale(1.1, .9); }
+  50% { transform: translateY(0) rotate(0deg) scale(1); }
+  70% { transform: translateY(-7px) rotate(2deg) scale(.98, 1.04); }
+}
+
+@keyframes kh-eye-blink {
+  0%, 39%, 47%, 79%, 87%, 100% { transform: scaleY(1); }
+  42%, 82% { transform: scaleY(.12); }
+}
+
+@keyframes kh-spark-pop {
+  0%, 100% { opacity: .45; transform: scale(.72); }
+  14% { opacity: 1; transform: scale(1.18); }
+  32% { opacity: .7; transform: scale(.9); }
+  62% { opacity: 1; transform: scale(1.08); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kh-badge,
+  .kh-mascot,
+  .kh-eyes,
+  .kh-spark {
+    animation-duration: 4s;
+    animation-timing-function: ease-in-out;
+  }
+
+  .kh-mascot,
+  .kh-eyes,
+  .kh-spark {
+    animation-name: none;
+  }
+
+  .kh-badge {
+    animation-name: kh-reduced-pulse;
+  }
+}
+
+@keyframes kh-reduced-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .86; }
+}

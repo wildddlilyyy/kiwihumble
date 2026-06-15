@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>KIWI HUMBLE 2027 Loader Demo</title>
+    <link rel="stylesheet" href="../src/kiwi-humble-loader.css" />
+    <style>
+      :root {
+        color-scheme: light;
+        --navy: #182d5b;
+        --ink: #162e5c;
+        --cream: #fff7df;
+        --gold: #f0a624;
+        --green: #459e3a;
+        --orange: #d86b1b;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-block-size: 100vh;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: #f9f4e8;
+      }
+
+      main {
+        min-block-size: 100vh;
+        display: grid;
+        grid-template-rows: auto 1fr;
+      }
+
+      header {
+        padding: 32px clamp(20px, 5vw, 64px) 20px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(28px, 5vw, 56px);
+        line-height: .95;
+        letter-spacing: 0;
+      }
+
+      p {
+        max-inline-size: 760px;
+        margin: 14px 0 0;
+        font-size: 16px;
+        line-height: 1.6;
+      }
+
+      .stage {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        min-block-size: 640px;
+      }
+
+      .panel {
+        display: grid;
+        align-content: center;
+        justify-items: center;
+        gap: 22px;
+        padding: clamp(24px, 5vw, 64px);
+      }
+
+      .panel-light {
+        background: #fffaf0;
+      }
+
+      .panel-dark {
+        color: #fff;
+        background:
+          linear-gradient(90deg, rgba(240, 166, 36, .13) 1px, transparent 1px),
+          linear-gradient(0deg, rgba(255, 255, 255, .08) 1px, transparent 1px),
+          var(--navy);
+        background-size: 26px 26px;
+      }
+
+      .loader-shell {
+        display: grid;
+        place-items: center;
+        inline-size: min(280px, 70vw);
+        aspect-ratio: 1;
+      }
+
+      .lottie-loader {
+        inline-size: 100%;
+        block-size: 100%;
+      }
+
+      .demo-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        min-block-size: 34px;
+        padding: 0 14px;
+        border: 3px solid currentColor;
+        border-radius: 999px;
+        font-weight: 900;
+        font-size: 13px;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+      }
+
+      .dot {
+        inline-size: 38px;
+        block-size: 10px;
+        border-radius: 999px;
+        background:
+          radial-gradient(circle at 5px 50%, var(--gold) 0 5px, transparent 5.5px),
+          radial-gradient(circle at 19px 50%, var(--green) 0 5px, transparent 5.5px),
+          radial-gradient(circle at 33px 50%, var(--orange) 0 5px, transparent 5.5px);
+      }
+
+      .demo-note {
+        max-inline-size: 360px;
+        margin: 0;
+        text-align: center;
+        font-size: 14px;
+        opacity: .76;
+      }
+
+      .kh-demo-svg {
+        display: block;
+        inline-size: 100%;
+        block-size: 100%;
+      }
+
+      .kh-demo-bg {
+        transform-origin: 51.39px 47.225px;
+        animation: kh-demo-badge-pulse 2s cubic-bezier(.34, 1.56, .64, 1) infinite;
+      }
+
+      .kh-demo-kiwi {
+        transform-origin: 52.39px 15.345px;
+        animation: kh-demo-kiwi-pop 2s cubic-bezier(.34, 1.56, .64, 1) infinite;
+      }
+
+      .kh-demo-burger {
+        transform-origin: 51.605px 69.49px;
+        animation: kh-demo-burger-bounce 2s cubic-bezier(.34, 1.56, .64, 1) infinite;
+      }
+
+      .kh-demo-eye-white,
+      .kh-demo-eye-blue {
+        animation: kh-demo-eye-blink 2s steps(1, end) infinite;
+      }
+
+      .kh-demo-eyes {
+        transform-origin: 51.605px 69.49px;
+        animation: kh-demo-burger-bounce 2s cubic-bezier(.34, 1.56, .64, 1) infinite;
+      }
+
+      .kh-demo-eye-white,
+      .kh-demo-eye-blue {
+        transform-box: fill-box;
+        transform-origin: center;
+      }
+
+      .kh-demo-humble {
+        transform-origin: 51.385px 76.23px;
+        animation: kh-demo-humble-settle 2s cubic-bezier(.34, 1.56, .64, 1) infinite;
+      }
+
+      .kh-demo-light-l,
+      .kh-demo-light-r {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: kh-demo-light-pop 2s ease-in-out infinite;
+      }
+
+      .kh-demo-light-r {
+        animation-delay: .12s;
+      }
+
+      @keyframes kh-demo-badge-pulse {
+        0%, 100% { transform: scale(1); }
+        24% { transform: scale(1.025); }
+        48% { transform: scale(.995); }
+        74% { transform: scale(1.012); }
+      }
+
+      @keyframes kh-demo-kiwi-pop {
+        0%, 100% { transform: translateY(0) rotate(0) scale(1); }
+        12% { transform: translateY(-1.6px) rotate(-2deg) scale(1.03); }
+        28% { transform: translateY(.6px) rotate(1deg) scale(.99); }
+      }
+
+      @keyframes kh-demo-burger-bounce {
+        0%, 100% { transform: translateY(0) rotate(0) scale(1); }
+        18% { transform: translateY(-5px) rotate(2deg) scale(.98, 1.04); }
+        33% { transform: translateY(1.7px) rotate(-1deg) scale(1.035, .965); }
+        52% { transform: translateY(0) rotate(0) scale(1); }
+      }
+
+      @keyframes kh-demo-humble-settle {
+        0%, 100% { transform: translateY(0) scale(1); }
+        18% { transform: translateY(1.2px) scale(1.01, .99); }
+        34% { transform: translateY(-.8px) scale(.995, 1.01); }
+      }
+
+      @keyframes kh-demo-eye-blink {
+        0%, 38%, 46%, 78%, 86%, 100% { transform: scaleY(1); }
+        42%, 82% { transform: scaleY(.08); }
+      }
+
+      @keyframes kh-demo-light-pop {
+        0%, 100% { opacity: .55; transform: scale(.86); }
+        14% { opacity: 1; transform: scale(1.16); }
+        32% { opacity: .7; transform: scale(.95); }
+        64% { opacity: 1; transform: scale(1.08); }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .kh-demo-kiwi,
+        .kh-demo-burger,
+        .kh-demo-eyes,
+        .kh-demo-humble,
+        .kh-demo-eye-white,
+        .kh-demo-eye-blue,
+        .kh-demo-light-l,
+        .kh-demo-light-r {
+          animation: none;
+        }
+
+        .kh-demo-bg {
+          animation: kh-demo-reduced-pulse 4s ease-in-out infinite;
+        }
+      }
+
+      @keyframes kh-demo-reduced-pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: .88; }
+      }
+
+      @media (max-width: 760px) {
+        .stage {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>KIWI HUMBLE 2027 Loader</h1>
+        <p>A playful flat-vector loading system with a Lottie primary animation and a CSS-only fallback.</p>
+      </header>
+
+      <section class="stage" aria-label="Loader previews">
+        <article class="panel panel-light">
+          <span class="demo-label"><span class="dot" aria-hidden="true"></span>Lottie</span>
+          <div class="loader-shell">
+            <div id="lottie-loader" class="lottie-loader" role="img" aria-label="Loading KIWI HUMBLE"></div>
+            <div id="lottie-fallback" class="kh-loader" style="--kh-loader-size: 260px; display: none;" role="status" aria-live="polite">
+              <span class="kh-loader__sr">Loading KIWI HUMBLE</span>
+              <svg class="kh-demo-svg" viewBox="-4 -4 110.78 102.45" aria-hidden="true">
+                <image class="kh-demo-bg" href="../assets/svg/svg-bg.svg" x="0" y="0" width="102.78" height="94.45"></image>
+                <image class="kh-demo-kiwi" href="../assets/svg/svg-kiwi.svg" x="21.93" y="3.69" width="60.92" height="23.31"></image>
+                <image class="kh-demo-light-l" href="../assets/svg/svg-light-l.svg" x="6.04" y="32.04" width="8.11" height="20.95"></image>
+                <image class="kh-demo-light-r" href="../assets/svg/svg-light-r.svg" x="89.05" y="32.04" width="8.11" height="20.95"></image>
+                <image class="kh-demo-burger" href="../assets/svg/svg-burger-base.svg" x="23.26" y="24.95" width="56.69" height="44.54"></image>
+                <g class="kh-demo-eyes">
+                  <image class="kh-demo-eye-white" href="../assets/svg/svg-eyew.svg" x="43.2" y="32.38" width="16.7" height="11.39"></image>
+                  <image class="kh-demo-eye-blue" href="../assets/svg/svg-eyeb.svg" x="45.98" y="35.31" width="13.27" height="7.43"></image>
+                </g>
+                <image class="kh-demo-humble" href="../assets/svg/svg-humble.svg" x="8.22" y="61.27" width="86.33" height="29.92"></image>
+              </svg>
+            </div>
+          </div>
+          <p class="demo-note">If Lottie or local JSON loading is unavailable, this panel gracefully swaps to the CSS fallback.</p>
+        </article>
+
+        <article class="panel panel-dark">
+          <span class="demo-label"><span class="dot" aria-hidden="true"></span>CSS fallback</span>
+          <div class="kh-loader" style="--kh-loader-size: 260px;" role="status" aria-live="polite">
+            <span class="kh-loader__sr">Loading KIWI HUMBLE</span>
+            <svg class="kh-demo-svg" viewBox="-4 -4 110.78 102.45" aria-hidden="true">
+              <image class="kh-demo-bg" href="../assets/svg/svg-bg.svg" x="0" y="0" width="102.78" height="94.45"></image>
+              <image class="kh-demo-kiwi" href="../assets/svg/svg-kiwi.svg" x="21.93" y="3.69" width="60.92" height="23.31"></image>
+              <image class="kh-demo-light-l" href="../assets/svg/svg-light-l.svg" x="6.04" y="32.04" width="8.11" height="20.95"></image>
+              <image class="kh-demo-light-r" href="../assets/svg/svg-light-r.svg" x="89.05" y="32.04" width="8.11" height="20.95"></image>
+              <image class="kh-demo-burger" href="../assets/svg/svg-burger-base.svg" x="23.26" y="24.95" width="56.69" height="44.54"></image>
+              <g class="kh-demo-eyes">
+                <image class="kh-demo-eye-white" href="../assets/svg/svg-eyew.svg" x="43.2" y="32.38" width="16.7" height="11.39"></image>
+                <image class="kh-demo-eye-blue" href="../assets/svg/svg-eyeb.svg" x="45.98" y="35.31" width="13.27" height="7.43"></image>
+              </g>
+              <image class="kh-demo-humble" href="../assets/svg/svg-humble.svg" x="8.22" y="61.27" width="86.33" height="29.92"></image>
+            </svg>
+          </div>
+          <p class="demo-note">No JavaScript is required for this version, and reduced-motion preferences are respected.</p>
+        </article>
+      </section>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+    <script>
+      const lottieTarget = document.querySelector("#lottie-loader");
+      const lottieFallback = document.querySelector("#lottie-fallback");
+
+      function showFallback() {
+        lottieTarget.style.display = "none";
+        lottieFallback.style.display = "inline-grid";
+      }
+
+      if (window.location.protocol === "file:") {
+        showFallback();
+      } else if (window.lottie) {
+        fetch("../assets/lottie/kiwi-humble-loader-2027.json")
+          .then((response) => {
+            if (!response.ok) throw new Error("Lottie JSON not available");
+            return response.json();
+          })
+          .then((animationData) => {
+            window.lottie.loadAnimation({
+              container: lottieTarget,
+              renderer: "svg",
+              loop: true,
+              autoplay: true,
+              animationData,
+              assetsPath: "../assets/svg/",
+            });
+          })
+          .catch(showFallback);
+      } else {
+        showFallback();
+      }
+    </script>
+  </body>
+</html>

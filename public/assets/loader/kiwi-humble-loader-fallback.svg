@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="kh-loader-svg" viewBox="-4 -4 110.78 102.45" role="img" aria-labelledby="kh-title kh-desc">
+  <title id="kh-title">Loading KIWI HUMBLE</title>
+  <desc id="kh-desc">Animated KIWI HUMBLE mascot loader assembled from the official separated KIWI HUMBLE SVG parts.</desc>
+  <style>
+    #kh-bg{transform-origin:51.39px 47.225px;animation:kh-badge-pulse 2s cubic-bezier(.34,1.56,.64,1) infinite}
+    #kh-kiwi{transform-origin:52.39px 15.345px;animation:kh-kiwi-pop 2s cubic-bezier(.34,1.56,.64,1) infinite}
+    #kh-burger{transform-origin:51.605px 69.49px;animation:kh-burger-bounce 2s cubic-bezier(.34,1.56,.64,1) infinite}
+    #kh-eyes{transform-origin:51.605px 69.49px;animation:kh-burger-bounce 2s cubic-bezier(.34,1.56,.64,1) infinite}
+    #kh-eye-white,#kh-eye-blue{transform-origin:center;transform-box:fill-box;animation:kh-eye-blink 2s steps(1,end) infinite}
+    #kh-humble{transform-origin:51.385px 76.23px;animation:kh-humble-settle 2s cubic-bezier(.34,1.56,.64,1) infinite}
+    #kh-light-l,#kh-light-r{transform-origin:center;transform-box:fill-box;animation:kh-light-pop 2s ease-in-out infinite}
+    #kh-light-r{animation-delay:.12s}
+    @keyframes kh-badge-pulse{0%,100%{transform:scale(1)}24%{transform:scale(1.025)}48%{transform:scale(.995)}74%{transform:scale(1.012)}}
+    @keyframes kh-kiwi-pop{0%,100%{transform:translateY(0) rotate(0) scale(1)}12%{transform:translateY(-1.6px) rotate(-2deg) scale(1.03)}28%{transform:translateY(.6px) rotate(1deg) scale(.99)}}
+    @keyframes kh-burger-bounce{0%,100%{transform:translateY(0) rotate(0) scale(1)}18%{transform:translateY(-5px) rotate(2deg) scale(.98,1.04)}33%{transform:translateY(1.7px) rotate(-1deg) scale(1.035,.965)}52%{transform:translateY(0) rotate(0) scale(1)}}
+    @keyframes kh-humble-settle{0%,100%{transform:translateY(0) scale(1)}18%{transform:translateY(1.2px) scale(1.01,.99)}34%{transform:translateY(-.8px) scale(.995,1.01)}}
+    @keyframes kh-eye-blink{0%,38%,46%,78%,86%,100%{transform:scaleY(1)}42%,82%{transform:scaleY(.08)}}
+    @keyframes kh-light-pop{0%,100%{opacity:.55;transform:scale(.86)}14%{opacity:1;transform:scale(1.16)}32%{opacity:.7;transform:scale(.95)}64%{opacity:1;transform:scale(1.08)}}
+    @media (prefers-reduced-motion:reduce){#kh-kiwi,#kh-burger,#kh-humble,#kh-light-l,#kh-light-r,#kh-eyes,#kh-eye-white,#kh-eye-blue{animation:none}#kh-bg{animation:kh-reduced-pulse 4s ease-in-out infinite}@keyframes kh-reduced-pulse{0%,100%{opacity:1}50%{opacity:.88}}}
+  </style>
+  <image id="kh-bg" href="svg-bg.svg" x="0" y="0" width="102.78" height="94.45"/>
+  <image id="kh-kiwi" href="svg-kiwi.svg" x="21.93" y="3.69" width="60.92" height="23.31"/>
+  <image id="kh-light-l" href="svg-light-l.svg" x="6.04" y="32.04" width="8.11" height="20.95"/>
+  <image id="kh-light-r" href="svg-light-r.svg" x="89.05" y="32.04" width="8.11" height="20.95"/>
+  <image id="kh-burger" href="svg-burger-base.svg" x="23.26" y="24.95" width="56.69" height="44.54"/>
+  <g id="kh-eyes">
+    <image id="kh-eye-white" href="svg-eyew.svg" x="43.2" y="32.38" width="16.7" height="11.39"/>
+    <image id="kh-eye-blue" href="svg-eyeb.svg" x="45.98" y="35.31" width="13.27" height="7.43"/>
+  </g>
+  <image id="kh-humble" href="svg-humble.svg" x="8.22" y="61.27" width="86.33" height="29.92"/>
+</svg>

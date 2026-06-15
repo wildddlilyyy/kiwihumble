@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -4 110.78 102.45" role="img" aria-labelledby="title desc">
+  <title id="title">KIWI HUMBLE 2027 loader mark</title>
+  <desc id="desc">The KIWI HUMBLE 2027 loader assembled from separated brand SVG components.</desc>
+  <image href="svg-bg.svg" x="0" y="0" width="102.78" height="94.45"/>
+  <image href="svg-kiwi.svg" x="21.93" y="3.69" width="60.92" height="23.31"/>
+  <image href="svg-light-l.svg" x="6.04" y="32.04" width="8.11" height="20.95"/>
+  <image href="svg-light-r.svg" x="89.05" y="32.04" width="8.11" height="20.95"/>
+  <image href="svg-burger-base.svg" x="23.26" y="24.95" width="56.69" height="44.54"/>
+  <image href="svg-eyew.svg" x="43.2" y="32.38" width="16.7" height="11.39"/>
+  <image href="svg-eyeb.svg" x="45.98" y="35.31" width="13.27" height="7.43"/>
+  <image href="svg-humble.svg" x="8.22" y="61.27" width="86.33" height="29.92"/>
+</svg>
