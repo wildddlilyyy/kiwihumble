@@ -20,7 +20,9 @@ export default {
         },
       },
       fontFamily: {
-        sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        sans: ["Nunito", "ui-sans-serif", "system-ui", "sans-serif"],
+        display: ["Baloo 2", "Nunito", "ui-sans-serif", "system-ui", "sans-serif"],
+        hand: ["Patrick Hand", "cursive"],
       },
     },
   },

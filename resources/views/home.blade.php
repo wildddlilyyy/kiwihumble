@@ -1,6 +1,6 @@
 <x-layouts.app :title="$title">
     <main
-        class="min-h-screen overflow-hidden bg-kiwi-blue text-white"
+        class="kiwi-grid-bg min-h-screen overflow-hidden bg-kiwi-blue text-white"
         data-countdown
         data-target-date="{{ $tripDate }}T00:00:00+08:00"
         data-timezone="{{ $timezone }}"
@@ -11,8 +11,8 @@
                     <x-kiwi-loader />
                 </div>
 
-                <p class="mt-8 text-sm font-black uppercase tracking-[0.28em] text-kiwi-gold">2027 / 5 / 29</p>
-                <h1 class="mx-auto mt-4 max-w-4xl text-balance text-4xl font-black leading-none tracking-normal sm:text-6xl lg:text-7xl">
+                <p class="mt-8 font-hand text-xl text-kiwi-gold sm:text-2xl">2027 / 5 / 29</p>
+                <h1 class="mx-auto mt-4 max-w-4xl text-balance font-display text-4xl font-extrabold leading-none tracking-normal sm:text-6xl lg:text-7xl">
                     {{ $title }}
                 </h1>
 

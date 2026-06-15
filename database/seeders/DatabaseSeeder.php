@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
         );
 
         $settings = [
-            'trip_title' => ['KIWI GROUP Humble Graduation Trip', 'string'],
+            'trip_title' => ['KIWI HUMBLE 2027 Graduation Adventure', 'string'],
             'trip_date' => ['2027-05-29', 'date'],
             'timezone' => ['Asia/Taipei', 'timezone'],
         ];
