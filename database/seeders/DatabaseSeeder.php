@@ -15,6 +15,9 @@ class DatabaseSeeder extends Seeder
             ['email' => env('ADMIN_EMAIL', 'admin@example.com')],
             [
                 'name' => env('ADMIN_NAME', 'KIWI Admin'),
+                'phone' => null,
+                'mom_name' => null,
+                'dad_name' => null,
                 'password' => Hash::make(env('ADMIN_PASSWORD', 'password')),
                 'is_admin' => true,
             ],

@@ -15,7 +15,7 @@ class HomePageTest extends TestCase
 
         $this->get('/')
             ->assertOk()
-            ->assertSee('KIWI GROUP Humble Graduation Trip')
+            ->assertSee('KIWI HUMBLE 2027 Graduation Adventure')
             ->assertSee('2027 / 5 / 29')
             ->assertSee('data-countdown', false);
     }
