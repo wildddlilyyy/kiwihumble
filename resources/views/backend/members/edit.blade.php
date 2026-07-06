@@ -39,12 +39,22 @@
 
                 <label class="mt-5 block">
                     <span class="text-sm font-bold text-slate-700">New Password</span>
-                    <input class="mt-2 w-full rounded-lg border-slate-300 focus:border-kiwi-blue focus:ring-kiwi-blue" type="password" name="password" required>
+                    <div class="mt-2 flex rounded-lg border border-slate-300 bg-white focus-within:border-kiwi-blue focus-within:ring-1 focus-within:ring-kiwi-blue">
+                        <input id="member-reset-password" class="w-full rounded-l-lg border-0 focus:ring-0" type="password" name="password" required>
+                        <button class="px-3 text-sm font-black text-kiwi-blue" type="button" data-password-toggle="#member-reset-password" aria-pressed="false">
+                            Show
+                        </button>
+                    </div>
                 </label>
 
                 <label class="mt-5 block">
                     <span class="text-sm font-bold text-slate-700">Confirm Password</span>
-                    <input class="mt-2 w-full rounded-lg border-slate-300 focus:border-kiwi-blue focus:ring-kiwi-blue" type="password" name="password_confirmation" required>
+                    <div class="mt-2 flex rounded-lg border border-slate-300 bg-white focus-within:border-kiwi-blue focus-within:ring-1 focus-within:ring-kiwi-blue">
+                        <input id="member-reset-password-confirmation" class="w-full rounded-l-lg border-0 focus:ring-0" type="password" name="password_confirmation" required>
+                        <button class="px-3 text-sm font-black text-kiwi-blue" type="button" data-password-toggle="#member-reset-password-confirmation" aria-pressed="false">
+                            Show
+                        </button>
+                    </div>
                 </label>
 
                 <button class="mt-6 rounded-lg bg-kiwi-orange px-4 py-2 text-sm font-black text-white hover:bg-kiwi-brown" type="submit">

@@ -16,6 +16,12 @@
                     {{ $title }}
                 </h1>
 
+                <div class="mt-7">
+                    <a class="inline-flex rounded-full bg-kiwi-gold px-6 py-3 font-display text-lg font-extrabold text-kiwi-ink shadow-lg shadow-black/10 transition hover:bg-white" href="{{ route('member.login') }}">
+                        Member Login
+                    </a>
+                </div>
+
                 <div class="mx-auto mt-8 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4" aria-label="Countdown to graduation trip">
                     <div class="count-card">
                         <span class="count-value" data-count-days>000</span>

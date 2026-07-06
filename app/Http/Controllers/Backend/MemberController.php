@@ -30,18 +30,23 @@ class MemberController
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255', 'unique:users,name'],
-            'phone' => ['nullable', 'string', 'max:40'],
+            'birthday' => ['nullable', 'date'],
             'mom_name' => ['nullable', 'string', 'max:120'],
+            'mom_phone' => ['nullable', 'string', 'max:40'],
             'dad_name' => ['nullable', 'string', 'max:120'],
+            'dad_phone' => ['nullable', 'string', 'max:40'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
         User::query()->create([
             'name' => $validated['name'],
             'email' => null,
-            'phone' => $validated['phone'] ?? null,
+            'birthday' => $validated['birthday'] ?? null,
             'mom_name' => $validated['mom_name'] ?? null,
+            'mom_phone' => $validated['mom_phone'] ?? null,
             'dad_name' => $validated['dad_name'] ?? null,
+            'dad_phone' => $validated['dad_phone'] ?? null,
+            'login_password' => $validated['password'],
             'password' => Hash::make($validated['password']),
             'is_admin' => false,
         ]);
@@ -66,9 +71,11 @@ class MemberController
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255', Rule::unique('users', 'name')->ignore($member)],
-            'phone' => ['nullable', 'string', 'max:40'],
+            'birthday' => ['nullable', 'date'],
             'mom_name' => ['nullable', 'string', 'max:120'],
+            'mom_phone' => ['nullable', 'string', 'max:40'],
             'dad_name' => ['nullable', 'string', 'max:120'],
+            'dad_phone' => ['nullable', 'string', 'max:40'],
         ]);
 
         $member->update($validated);
@@ -87,6 +94,7 @@ class MemberController
         ]);
 
         $member->update([
+            'login_password' => $validated['password'],
             'password' => Hash::make($validated['password']),
         ]);
 

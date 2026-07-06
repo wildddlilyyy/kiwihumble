@@ -25,12 +25,18 @@
 
                 <label class="block">
                     <span class="text-sm font-bold text-slate-700">Password</span>
-                    <input
-                        class="mt-2 w-full rounded-lg border-slate-300 focus:border-kiwi-blue focus:ring-kiwi-blue"
-                        type="password"
-                        name="password"
-                        required
-                    >
+                    <div class="mt-2 flex rounded-lg border border-slate-300 bg-white focus-within:border-kiwi-blue focus-within:ring-1 focus-within:ring-kiwi-blue">
+                        <input
+                            id="backend-password"
+                            class="w-full rounded-l-lg border-0 focus:ring-0"
+                            type="password"
+                            name="password"
+                            required
+                        >
+                        <button class="px-3 text-sm font-black text-kiwi-blue" type="button" data-password-toggle="#backend-password" aria-pressed="false">
+                            Show
+                        </button>
+                    </div>
                 </label>
 
                 <label class="flex items-center gap-2 text-sm text-slate-600">

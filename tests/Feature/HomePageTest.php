@@ -17,6 +17,7 @@ class HomePageTest extends TestCase
             ->assertOk()
             ->assertSee('KIWI HUMBLE 2027 Graduation Adventure')
             ->assertSee('2027 / 5 / 29')
+            ->assertSee('Member Login')
             ->assertSee('data-countdown', false);
     }
 }

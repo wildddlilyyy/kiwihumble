@@ -10,6 +10,14 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'member' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
+        'backend' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
     ],
     'providers' => [
         'users' => [

@@ -10,7 +10,7 @@ class EnsureUserIsMember
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->user() || $request->user()->is_admin) {
+        if (! $request->user('member') || $request->user('member')->is_admin) {
             abort(403);
         }
 

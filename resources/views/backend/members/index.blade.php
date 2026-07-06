@@ -25,14 +25,17 @@
                 </div>
             @endif
 
-            <div class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-black/5">
-                <table class="w-full text-left text-sm">
+            <div class="overflow-x-auto rounded-xl bg-white shadow-sm ring-1 ring-black/5">
+                <table class="w-full min-w-[980px] text-left text-sm">
                     <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                         <tr>
                             <th class="px-4 py-3">Name</th>
-                            <th class="px-4 py-3">Phone</th>
+                            <th class="px-4 py-3">Birthday</th>
                             <th class="px-4 py-3">Mom</th>
+                            <th class="px-4 py-3">Mom Phone</th>
                             <th class="px-4 py-3">Dad</th>
+                            <th class="px-4 py-3">Dad Phone</th>
+                            <th class="px-4 py-3">Password</th>
                             <th class="px-4 py-3">Updated</th>
                             <th class="px-4 py-3 text-right">Action</th>
                         </tr>
@@ -41,9 +44,12 @@
                         @forelse ($members as $member)
                             <tr>
                                 <td class="px-4 py-3 font-bold text-kiwi-ink">{{ $member->name }}</td>
-                                <td class="px-4 py-3 text-slate-700">{{ $member->phone ?: '-' }}</td>
+                                <td class="px-4 py-3 text-slate-700">{{ $member->birthday?->format('Y-m-d') ?: '-' }}</td>
                                 <td class="px-4 py-3 text-slate-700">{{ $member->mom_name ?: '-' }}</td>
+                                <td class="px-4 py-3 text-slate-700">{{ $member->mom_phone ?: '-' }}</td>
                                 <td class="px-4 py-3 text-slate-700">{{ $member->dad_name ?: '-' }}</td>
+                                <td class="px-4 py-3 text-slate-700">{{ $member->dad_phone ?: '-' }}</td>
+                                <td class="px-4 py-3 font-bold text-amber-700">{{ $member->login_password ?: '-' }}</td>
                                 <td class="px-4 py-3 text-slate-500">{{ $member->updated_at?->format('Y-m-d') }}</td>
                                 <td class="px-4 py-3 text-right">
                                     <a class="font-black text-kiwi-blue hover:text-kiwi-ink" href="{{ route('backend.members.edit', $member) }}">
@@ -53,7 +59,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td class="px-4 py-8 text-center font-semibold text-slate-500" colspan="6">
+                                <td class="px-4 py-8 text-center font-semibold text-slate-500" colspan="10">
                                     No members yet.
                                 </td>
                             </tr>

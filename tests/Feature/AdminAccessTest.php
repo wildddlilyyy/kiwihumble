@@ -20,7 +20,7 @@ class AdminAccessTest extends TestCase
     {
         $user = User::factory()->create(['is_admin' => false]);
 
-        $this->actingAs($user)->get('/backend')->assertForbidden();
+        $this->actingAs($user, 'backend')->get('/backend')->assertForbidden();
     }
 
     public function test_admin_can_login_to_backend(): void
@@ -38,7 +38,7 @@ class AdminAccessTest extends TestCase
         $this->seed();
         $admin = User::query()->where('is_admin', true)->firstOrFail();
 
-        $this->actingAs($admin)
+        $this->actingAs($admin, 'backend')
             ->get('/backend')
             ->assertOk()
             ->assertSee('KIWI HUMBLE Dashboard');
@@ -49,7 +49,7 @@ class AdminAccessTest extends TestCase
         $this->seed();
         $admin = User::query()->where('is_admin', true)->firstOrFail();
 
-        $this->actingAs($admin)
+        $this->actingAs($admin, 'backend')
             ->post('/backend/settings', [
                 'trip_title' => 'KIWI GROUP Humble Test Trip',
                 'trip_date' => '2027-06-01',
@@ -73,12 +73,14 @@ class AdminAccessTest extends TestCase
         $this->seed();
         $admin = User::query()->where('is_admin', true)->firstOrFail();
 
-        $this->actingAs($admin)
+        $this->actingAs($admin, 'backend')
             ->post('/backend/members', [
                 'name' => 'Lily Family',
-                'phone' => '0912345678',
+                'birthday' => '2019-05-20',
                 'mom_name' => 'Mom Lily',
+                'mom_phone' => '0912345678',
                 'dad_name' => 'Dad Lily',
+                'dad_phone' => '0922333444',
                 'password' => 'member-password',
                 'password_confirmation' => 'member-password',
             ])
@@ -86,9 +88,12 @@ class AdminAccessTest extends TestCase
 
         $this->assertDatabaseHas('users', [
             'name' => 'Lily Family',
-            'phone' => '0912345678',
+            'birthday' => '2019-05-20 00:00:00',
             'mom_name' => 'Mom Lily',
+            'mom_phone' => '0912345678',
             'dad_name' => 'Dad Lily',
+            'dad_phone' => '0922333444',
+            'login_password' => 'member-password',
             'is_admin' => false,
         ]);
     }
@@ -99,7 +104,7 @@ class AdminAccessTest extends TestCase
         $admin = User::query()->where('is_admin', true)->firstOrFail();
         User::factory()->create(['name' => 'Lily Family', 'is_admin' => false]);
 
-        $this->actingAs($admin)
+        $this->actingAs($admin, 'backend')
             ->from('/backend/members/create')
             ->post('/backend/members', [
                 'name' => 'Lily Family',
@@ -116,21 +121,25 @@ class AdminAccessTest extends TestCase
         $admin = User::query()->where('is_admin', true)->firstOrFail();
         $member = User::factory()->create(['name' => 'Lily Family', 'is_admin' => false]);
 
-        $this->actingAs($admin)
+        $this->actingAs($admin, 'backend')
             ->put("/backend/members/{$member->id}", [
                 'name' => 'Lily Family Updated',
-                'phone' => '0987654321',
+                'birthday' => '2018-06-10',
                 'mom_name' => 'Mom Updated',
+                'mom_phone' => '0987654321',
                 'dad_name' => 'Dad Updated',
+                'dad_phone' => '0977777777',
             ])
             ->assertRedirect('/backend/members');
 
         $this->assertDatabaseHas('users', [
             'id' => $member->id,
             'name' => 'Lily Family Updated',
-            'phone' => '0987654321',
+            'birthday' => '2018-06-10 00:00:00',
             'mom_name' => 'Mom Updated',
+            'mom_phone' => '0987654321',
             'dad_name' => 'Dad Updated',
+            'dad_phone' => '0977777777',
         ]);
     }
 
@@ -144,18 +153,38 @@ class AdminAccessTest extends TestCase
             'is_admin' => false,
         ]);
 
-        $this->actingAs($admin)
+        $this->actingAs($admin, 'backend')
             ->post("/backend/members/{$member->id}/password", [
                 'password' => 'new-password',
                 'password_confirmation' => 'new-password',
             ])
             ->assertRedirect("/backend/members/{$member->id}/edit");
 
-        $this->post('/logout');
+        $this->assertDatabaseHas('users', [
+            'id' => $member->id,
+            'login_password' => 'new-password',
+        ]);
 
         $this->post('/member/login', [
             'name' => 'Lily Family',
             'password' => 'new-password',
         ])->assertRedirect('/member');
+    }
+
+    public function test_backend_members_list_shows_recorded_password(): void
+    {
+        $this->seed();
+        $admin = User::query()->where('is_admin', true)->firstOrFail();
+
+        User::factory()->create([
+            'name' => 'Liam',
+            'login_password' => 'family-secret',
+            'is_admin' => false,
+        ]);
+
+        $this->actingAs($admin, 'backend')
+            ->get('/backend/members')
+            ->assertOk()
+            ->assertSee('family-secret');
     }
 }

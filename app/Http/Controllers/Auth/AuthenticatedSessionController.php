@@ -12,6 +12,10 @@ class AuthenticatedSessionController
 {
     public function createMember(): View
     {
+        if (Auth::guard('member')->check()) {
+            return redirect()->route('member.dashboard');
+        }
+
         return view('auth.member-login');
     }
 
@@ -24,7 +28,7 @@ class AuthenticatedSessionController
 
         $credentials['is_admin'] = false;
 
-        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
+        if (! Auth::guard('member')->attempt($credentials, $request->boolean('remember'))) {
             throw ValidationException::withMessages([
                 'name' => 'The member login details are incorrect. Please try again.',
             ]);
@@ -37,6 +41,10 @@ class AuthenticatedSessionController
 
     public function createBackend(): View
     {
+        if (Auth::guard('backend')->check()) {
+            return redirect()->route('backend.dashboard');
+        }
+
         return view('auth.backend-login');
     }
 
@@ -49,7 +57,7 @@ class AuthenticatedSessionController
 
         $credentials['is_admin'] = true;
 
-        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
+        if (! Auth::guard('backend')->attempt($credentials, $request->boolean('remember'))) {
             throw ValidationException::withMessages([
                 'email' => 'The backend login details are incorrect. Please try again.',
             ]);
@@ -60,9 +68,29 @@ class AuthenticatedSessionController
         return redirect()->intended(route('backend.dashboard'));
     }
 
+    public function destroyMember(Request $request): RedirectResponse
+    {
+        Auth::guard('member')->logout();
+
+        $request->session()->regenerateToken();
+
+        return redirect()->route('home');
+    }
+
+    public function destroyBackend(Request $request): RedirectResponse
+    {
+        Auth::guard('backend')->logout();
+
+        $request->session()->regenerateToken();
+
+        return redirect()->route('backend.login');
+    }
+
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();
+        Auth::guard('member')->logout();
+        Auth::guard('backend')->logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

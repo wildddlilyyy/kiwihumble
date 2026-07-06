@@ -16,8 +16,12 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => env('ADMIN_NAME', 'KIWI Admin'),
                 'phone' => null,
+                'birthday' => null,
                 'mom_name' => null,
+                'mom_phone' => null,
                 'dad_name' => null,
+                'dad_phone' => null,
+                'login_password' => null,
                 'password' => Hash::make(env('ADMIN_PASSWORD', 'password')),
                 'is_admin' => true,
             ],
