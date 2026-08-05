@@ -26,16 +26,14 @@ class ClassShirtOrder extends Model
 
     protected $fillable = [
         'user_id',
-        'category',
-        'size',
-        'quantity',
+        'items',
         'submitted_at',
     ];
 
     protected function casts(): array
     {
         return [
-            'quantity' => 'integer',
+            'items' => 'array',
             'submitted_at' => 'datetime',
         ];
     }
@@ -45,8 +43,13 @@ class ClassShirtOrder extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function categoryLabel(): string
+    public static function categoryLabel(string $category): string
     {
-        return self::CATEGORY_LABELS[$this->category] ?? $this->category;
+        return self::CATEGORY_LABELS[$category] ?? $category;
+    }
+
+    public function totalQuantity(): int
+    {
+        return collect($this->items ?? [])->sum(fn (array $item) => (int) ($item['quantity'] ?? 0));
     }
 }

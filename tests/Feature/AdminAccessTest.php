@@ -200,9 +200,9 @@ class AdminAccessTest extends TestCase
 
         ClassShirtOrder::query()->create([
             'user_id' => $member->id,
-            'category' => 'adult',
-            'size' => 'L',
-            'quantity' => 3,
+            'items' => [
+                ['category' => 'adult', 'size' => 'L', 'quantity' => 3],
+            ],
             'submitted_at' => now(),
         ]);
 
@@ -228,9 +228,9 @@ class AdminAccessTest extends TestCase
 
         ClassShirtOrder::query()->create([
             'user_id' => $member->id,
-            'category' => 'adult',
-            'size' => 'L',
-            'quantity' => 3,
+            'items' => [
+                ['category' => 'adult', 'size' => 'L', 'quantity' => 3],
+            ],
             'submitted_at' => now(),
         ]);
 

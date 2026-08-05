@@ -66,8 +66,7 @@ class MemberAccessTest extends TestCase
         $this->post('/member/login', [
             'name' => 'KIWI Admin',
             'password' => 'password',
-        ])
-            ->assertSessionHasErrors('name');
+        ])->assertSessionHasErrors('name');
     }
 
     public function test_admin_is_forbidden_from_member_dashboard(): void
@@ -105,80 +104,95 @@ class MemberAccessTest extends TestCase
         ]);
     }
 
-    public function test_member_can_create_update_and_delete_class_shirt_order(): void
+    public function test_member_can_submit_and_replace_single_class_shirt_order(): void
     {
         $member = User::factory()->create(['is_admin' => false]);
 
         $this->actingAs($member, 'member')
-            ->post('/member/class-shirt-orders', [
-                'category' => 'child',
-                'size' => '#8',
-                'quantity' => 2,
+            ->postJson('/member/class-shirt-order', [
+                'items' => [
+                    ['category' => 'child', 'size' => '#8', 'quantity' => 2],
+                    ['category' => 'adult', 'size' => 'L', 'quantity' => 1],
+                ],
             ])
-            ->assertRedirect('/member?tab=class-shirt');
+            ->assertOk()
+            ->assertJsonPath('status', '班服訂單已送出。')
+            ->assertJsonPath('items.0.size', '#8');
 
         $order = ClassShirtOrder::query()->where('user_id', $member->id)->firstOrFail();
 
-        $this->assertDatabaseHas('class_shirt_orders', [
-            'id' => $order->id,
-            'category' => 'child',
-            'size' => '#8',
-            'quantity' => 2,
-        ]);
+        $this->assertSame(1, ClassShirtOrder::query()->where('user_id', $member->id)->count());
+        $this->assertSame([
+            ['category' => 'child', 'size' => '#8', 'quantity' => 2],
+            ['category' => 'adult', 'size' => 'L', 'quantity' => 1],
+        ], $order->items);
 
         $this->actingAs($member, 'member')
-            ->put("/member/class-shirt-orders/{$order->id}", [
-                'category' => 'adult',
-                'size' => 'L',
-                'quantity' => 3,
+            ->postJson('/member/class-shirt-order', [
+                'items' => [
+                    ['category' => 'adult', 'size' => 'XL', 'quantity' => 3],
+                ],
             ])
-            ->assertRedirect('/member?tab=class-shirt');
+            ->assertOk()
+            ->assertJsonPath('items.0.size', 'XL');
 
-        $this->assertDatabaseHas('class_shirt_orders', [
-            'id' => $order->id,
-            'category' => 'adult',
-            'size' => 'L',
-            'quantity' => 3,
-        ]);
+        $order->refresh();
+
+        $this->assertSame(1, ClassShirtOrder::query()->where('user_id', $member->id)->count());
+        $this->assertSame([
+            ['category' => 'adult', 'size' => 'XL', 'quantity' => 3],
+        ], $order->items);
+        $this->assertNotNull($order->submitted_at);
 
         $this->actingAs($member, 'member')
-            ->delete("/member/class-shirt-orders/{$order->id}")
-            ->assertRedirect('/member?tab=class-shirt');
+            ->deleteJson('/member/class-shirt-order')
+            ->assertOk()
+            ->assertJsonPath('items', []);
 
         $this->assertDatabaseMissing('class_shirt_orders', [
             'id' => $order->id,
         ]);
     }
 
-    public function test_member_cannot_update_or_delete_another_members_class_shirt_order(): void
+    public function test_member_cannot_submit_invalid_class_shirt_size(): void
+    {
+        $member = User::factory()->create(['is_admin' => false]);
+
+        $this->actingAs($member, 'member')
+            ->postJson('/member/class-shirt-order', [
+                'items' => [
+                    ['category' => 'child', 'size' => 'L', 'quantity' => 1],
+                ],
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('items.0.size');
+    }
+
+    public function test_member_submission_does_not_change_another_members_class_shirt_order(): void
     {
         $member = User::factory()->create(['is_admin' => false]);
         $otherMember = User::factory()->create(['is_admin' => false]);
-        $order = ClassShirtOrder::query()->create([
+        $otherOrder = ClassShirtOrder::query()->create([
             'user_id' => $otherMember->id,
-            'category' => 'adult',
-            'size' => 'M',
-            'quantity' => 1,
+            'items' => [
+                ['category' => 'adult', 'size' => 'M', 'quantity' => 1],
+            ],
             'submitted_at' => now(),
         ]);
 
         $this->actingAs($member, 'member')
-            ->put("/member/class-shirt-orders/{$order->id}", [
-                'category' => 'adult',
-                'size' => 'L',
-                'quantity' => 2,
+            ->postJson('/member/class-shirt-order', [
+                'items' => [
+                    ['category' => 'adult', 'size' => 'L', 'quantity' => 2],
+                ],
             ])
-            ->assertNotFound();
+            ->assertOk();
 
-        $this->actingAs($member, 'member')
-            ->delete("/member/class-shirt-orders/{$order->id}")
-            ->assertNotFound();
+        $otherOrder->refresh();
 
-        $this->assertDatabaseHas('class_shirt_orders', [
-            'id' => $order->id,
-            'size' => 'M',
-            'quantity' => 1,
-        ]);
+        $this->assertSame([
+            ['category' => 'adult', 'size' => 'M', 'quantity' => 1],
+        ], $otherOrder->items);
     }
 
     public function test_backend_and_member_logins_can_exist_in_same_session(): void

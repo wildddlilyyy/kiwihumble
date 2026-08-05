@@ -34,9 +34,8 @@ Route::post('/backend/logout', [AuthenticatedSessionController::class, 'destroyB
 Route::middleware(['auth:member', 'member'])->prefix('member')->name('member.')->group(function () {
     Route::get('/', MemberDashboardController::class)->name('dashboard');
     Route::put('/', [MemberDashboardController::class, 'update'])->name('profile.update');
-    Route::post('/class-shirt-orders', [MemberClassShirtOrderController::class, 'store'])->name('class-shirt-orders.store');
-    Route::put('/class-shirt-orders/{order}', [MemberClassShirtOrderController::class, 'update'])->name('class-shirt-orders.update');
-    Route::delete('/class-shirt-orders/{order}', [MemberClassShirtOrderController::class, 'destroy'])->name('class-shirt-orders.destroy');
+    Route::post('/class-shirt-order', [MemberClassShirtOrderController::class, 'store'])->name('class-shirt-order.store');
+    Route::delete('/class-shirt-order', [MemberClassShirtOrderController::class, 'destroy'])->name('class-shirt-order.destroy');
 });
 
 Route::middleware(['auth:backend', 'admin'])->prefix('backend')->name('backend.')->group(function () {

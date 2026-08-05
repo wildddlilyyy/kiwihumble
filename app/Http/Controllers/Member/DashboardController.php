@@ -10,9 +10,7 @@ class DashboardController
 {
     public function __invoke(Request $request): View
     {
-        $member = $request->user('member')->load([
-            'classShirtOrders' => fn ($query) => $query->latest('submitted_at')->latest(),
-        ]);
+        $member = $request->user('member')->load('classShirtOrder');
 
         return view('member.dashboard', [
             'member' => $member,

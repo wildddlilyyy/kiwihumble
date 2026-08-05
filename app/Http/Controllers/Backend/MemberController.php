@@ -16,7 +16,7 @@ class MemberController
         return view('backend.members.index', [
             'members' => User::query()
                 ->where('is_admin', false)
-                ->withSum('classShirtOrders as class_shirt_quantity', 'quantity')
+                ->with('classShirtOrder')
                 ->orderBy('name')
                 ->get(),
         ]);

@@ -8,7 +8,7 @@
 
                 <div
                     class="mt-8 rounded-xl bg-white/95 p-6 text-kiwi-ink shadow-xl shadow-black/10 ring-1 ring-white/40"
-                    x-data="{ tab: new URLSearchParams(window.location.search).get('tab') === 'class-shirt' ? 'class-shirt' : 'profile', addOpen: false, editing: null }"
+                    x-data="{ tab: new URLSearchParams(window.location.search).get('tab') === 'class-shirt' ? 'class-shirt' : 'profile' }"
                 >
                     <p class="font-hand text-2xl text-kiwi-gold">Welcome back</p>
                     <h1 class="font-display text-4xl font-extrabold">{{ $member->name }}</h1>
@@ -125,7 +125,7 @@
 
                         <div class="grid gap-4 lg:grid-cols-2">
                             <div class="overflow-hidden rounded-xl border border-slate-200">
-                                <div class="bg-kiwi-ink px-4 py-2 font-black text-kiwi-gold">吸濕排汗 - 兒童 尺寸表/SIZE</div>
+                                <div class="bg-kiwi-ink px-4 py-2 font-black text-kiwi-gold">吸濕排汗 - 兒童 尺寸表 / SIZE</div>
                                 <table class="w-full text-center text-sm">
                                     <thead class="bg-sky-100 text-kiwi-blue">
                                         <tr class="h-12"><th class="px-3 py-3"></th><th class="px-3 py-3">#6</th><th class="px-3 py-3">#8</th><th class="px-3 py-3">#10</th></tr>
@@ -140,7 +140,7 @@
                             </div>
 
                             <div class="overflow-hidden rounded-xl border border-slate-200">
-                                <div class="bg-kiwi-ink px-4 py-2 font-black text-kiwi-gold">吸濕排汗 - 大人 尺寸表/SIZE（單位/cm）</div>
+                                <div class="bg-kiwi-ink px-4 py-2 font-black text-kiwi-gold">吸濕排汗 - 大人 尺寸表 / SIZE（單位 / cm）</div>
                                 <div class="overflow-x-auto">
                                     <table class="w-full min-w-[620px] text-center text-sm">
                                         <thead class="bg-sky-100 text-kiwi-blue">
@@ -159,56 +159,75 @@
 
                         <p class="text-sm font-bold text-slate-500">* 平放尺寸丈量，尺寸容許範圍 +-2.5cm 皆為正常值。</p>
 
-                        <div class="rounded-xl border border-slate-200 p-4">
+                        <div
+                            class="rounded-xl border border-slate-200 p-4"
+                            x-data="classShirtOrderForm({
+                                items: @js($member->classShirtOrder?->items ?? []),
+                                submittedAt: @js($member->classShirtOrder?->submitted_at?->timezone(config('app.timezone'))->format('Y-m-d H:i')),
+                                storeUrl: @js(route('member.class-shirt-order.store')),
+                                csrfToken: @js(csrf_token()),
+                            })"
+                        >
                             <div class="flex items-center justify-between gap-4">
-                                <h2 class="text-xl font-black text-kiwi-ink">我的班服訂購</h2>
-                                <button class="grid size-11 place-items-center rounded-full bg-kiwi-blue text-2xl font-black text-white hover:bg-kiwi-ink" type="button" @click="addOpen = ! addOpen; editing = null">
+                                <h2 class="text-xl font-black text-kiwi-ink">班服訂購內容</h2>
+                                <button class="grid size-11 place-items-center rounded-full bg-kiwi-blue text-2xl font-black text-white hover:bg-kiwi-ink" type="button" @click="addItem()">
                                     +
                                 </button>
                             </div>
 
-                            <form method="POST" action="{{ route('member.class-shirt-orders.store') }}" class="mt-4 grid gap-4 rounded-lg bg-slate-50 p-4 sm:grid-cols-[1fr_1fr_120px_auto]" x-show="addOpen">
-                                @csrf
-                                @include('member.partials.class-shirt-order-fields')
-                                <button class="self-end rounded-lg bg-kiwi-blue px-4 py-2 text-sm font-black text-white hover:bg-kiwi-ink" type="submit">確定</button>
-                            </form>
+                            <div class="mt-4 rounded-lg bg-emerald-50 p-3 text-sm font-bold text-emerald-700" x-show="status" x-text="status"></div>
+                            <div class="mt-4 rounded-lg bg-red-50 p-3 text-sm font-bold text-red-700" x-show="error" x-text="error"></div>
 
                             <div class="mt-4 space-y-3">
-                                @forelse ($member->classShirtOrders as $order)
-                                    <article class="rounded-lg border border-slate-200 p-4">
-                                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                            <div>
-                                                <p class="font-black text-kiwi-ink">{{ $order->categoryLabel() }} / {{ $order->size }} / {{ $order->quantity }} 件</p>
-                                                <p class="mt-1 text-sm font-bold text-slate-500">
-                                                    最後送出：{{ $order->submitted_at?->timezone(config('app.timezone'))->format('Y-m-d H:i') }}
-                                                </p>
-                                            </div>
-                                            <div class="flex gap-2">
-                                                <button class="rounded-lg border border-kiwi-blue px-3 py-2 text-sm font-black text-kiwi-blue hover:bg-slate-50" type="button" @click="editing = editing === {{ $order->id }} ? null : {{ $order->id }}; addOpen = false">
-                                                    修改
-                                                </button>
-                                                <form method="POST" action="{{ route('member.class-shirt-orders.destroy', $order) }}" onsubmit="return confirm('確定刪除這筆班服訂購嗎？')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button class="rounded-lg border border-red-200 px-3 py-2 text-sm font-black text-red-600 hover:bg-red-50" type="submit">
-                                                        刪除
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
-
-                                        <form method="POST" action="{{ route('member.class-shirt-orders.update', $order) }}" class="mt-4 grid gap-4 rounded-lg bg-slate-50 p-4 sm:grid-cols-[1fr_1fr_120px_auto]" x-show="editing === {{ $order->id }}">
-                                            @csrf
-                                            @method('PUT')
-                                            @include('member.partials.class-shirt-order-fields', ['order' => $order])
-                                            <button class="self-end rounded-lg bg-kiwi-blue px-4 py-2 text-sm font-black text-white hover:bg-kiwi-ink" type="submit">確定</button>
-                                        </form>
-                                    </article>
-                                @empty
+                                <template x-if="items.length === 0">
                                     <div class="rounded-lg bg-slate-50 p-6 text-center font-bold text-slate-500">
                                         尚未新增班服訂購。
                                     </div>
-                                @endforelse
+                                </template>
+
+                                <template x-for="(item, index) in items" :key="index">
+                                    <article class="grid gap-4 rounded-lg border border-slate-200 p-4 sm:grid-cols-[1fr_1fr_120px_auto]">
+                                        <label class="block">
+                                            <span class="text-sm font-bold text-slate-700">類別</span>
+                                            <select class="mt-2 w-full rounded-lg border-slate-300 focus:border-kiwi-blue focus:ring-kiwi-blue" x-model="item.category" @change="normalizeSize(item)">
+                                                <option value="child">兒童</option>
+                                                <option value="adult">大人</option>
+                                            </select>
+                                        </label>
+
+                                        <label class="block">
+                                            <span class="text-sm font-bold text-slate-700">尺寸</span>
+                                            <select class="mt-2 w-full rounded-lg border-slate-300 focus:border-kiwi-blue focus:ring-kiwi-blue" x-model="item.size">
+                                                <template x-for="size in sizeOptions[item.category]" :key="size">
+                                                    <option :value="size" x-text="size"></option>
+                                                </template>
+                                            </select>
+                                        </label>
+
+                                        <label class="block">
+                                            <span class="text-sm font-bold text-slate-700">數量</span>
+                                            <input class="mt-2 w-full rounded-lg border-slate-300 focus:border-kiwi-blue focus:ring-kiwi-blue" type="number" min="1" max="99" x-model.number="item.quantity">
+                                        </label>
+
+                                        <button class="self-end rounded-lg border border-red-200 px-3 py-2 text-sm font-black text-red-600 hover:bg-red-50" type="button" @click="removeItem(index)">
+                                            刪除
+                                        </button>
+                                    </article>
+                                </template>
+                            </div>
+
+                            <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                <p class="text-sm font-bold text-slate-500">
+                                    總數量：<span class="text-kiwi-blue" x-text="totalQuantity()"></span>
+                                    <template x-if="submittedAt">
+                                        <span>，最後送出：<span x-text="submittedAt"></span></span>
+                                    </template>
+                                </p>
+
+                                <button class="rounded-lg bg-kiwi-blue px-5 py-3 text-sm font-black text-white hover:bg-kiwi-ink disabled:cursor-not-allowed disabled:opacity-60" type="button" @click="submit()" :disabled="isSaving">
+                                    <span x-show="! isSaving">送出班服訂單</span>
+                                    <span x-show="isSaving">送出中...</span>
+                                </button>
                             </div>
                         </div>
                     </div>

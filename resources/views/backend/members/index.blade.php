@@ -55,7 +55,7 @@
                                 <td class="px-4 py-3 text-slate-700">{{ $member->mom_phone ?: '-' }}</td>
                                 <td class="px-4 py-3 text-slate-700">{{ $member->dad_name ?: '-' }}</td>
                                 <td class="px-4 py-3 text-slate-700">{{ $member->dad_phone ?: '-' }}</td>
-                                <td class="px-4 py-3 font-black text-kiwi-blue">{{ $member->class_shirt_quantity ?? 0 }}</td>
+                                <td class="px-4 py-3 font-black text-kiwi-blue">{{ $member->classShirtOrder?->totalQuantity() ?? 0 }}</td>
                                 <td class="px-4 py-3 font-bold text-amber-700">{{ $member->login_password ?: '-' }}</td>
                                 <td class="px-4 py-3 text-slate-500">{{ $member->updated_at?->format('Y-m-d') }}</td>
                                 <td class="px-4 py-3 text-right">

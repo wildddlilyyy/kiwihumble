@@ -15,7 +15,6 @@ class ClassShirtOrderExportController
             ->with('user')
             ->join('users', 'users.id', '=', 'class_shirt_orders.user_id')
             ->orderBy('users.name')
-            ->orderBy('class_shirt_orders.id')
             ->select('class_shirt_orders.*')
             ->get();
 
@@ -26,16 +25,24 @@ class ClassShirtOrderExportController
             ['NO', '會員 Name', '類別', '尺寸', '數量', '送出時間', '更新時間'],
         ]);
 
-        foreach ($orders as $index => $order) {
-            $sheet->fromArray([[
-                $index + 1,
-                $order->user?->name,
-                $order->categoryLabel(),
-                $order->size,
-                $order->quantity,
-                $order->submitted_at?->timezone(config('app.timezone'))->format('Y-m-d H:i:s'),
-                $order->updated_at?->timezone(config('app.timezone'))->format('Y-m-d H:i:s'),
-            ]], null, 'A'.($index + 2));
+        $row = 2;
+        $number = 1;
+
+        foreach ($orders as $order) {
+            foreach ($order->items ?? [] as $item) {
+                $sheet->fromArray([[
+                    $number,
+                    $order->user?->name,
+                    ClassShirtOrder::categoryLabel($item['category'] ?? ''),
+                    $item['size'] ?? '',
+                    $item['quantity'] ?? '',
+                    $order->submitted_at?->timezone(config('app.timezone'))->format('Y-m-d H:i:s'),
+                    $order->updated_at?->timezone(config('app.timezone'))->format('Y-m-d H:i:s'),
+                ]], null, 'A'.$row);
+
+                $row++;
+                $number++;
+            }
         }
 
         foreach (range('A', 'G') as $column) {
