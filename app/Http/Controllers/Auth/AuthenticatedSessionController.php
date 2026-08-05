@@ -10,7 +10,7 @@ use Illuminate\Validation\ValidationException;
 
 class AuthenticatedSessionController
 {
-    public function createMember(): View
+    public function createMember(): View|RedirectResponse
     {
         if (Auth::guard('member')->check()) {
             return redirect()->route('member.dashboard');
@@ -39,7 +39,7 @@ class AuthenticatedSessionController
         return redirect()->intended(route('member.dashboard'));
     }
 
-    public function createBackend(): View
+    public function createBackend(): View|RedirectResponse
     {
         if (Auth::guard('backend')->check()) {
             return redirect()->route('backend.dashboard');
