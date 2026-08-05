@@ -29,6 +29,7 @@
                 <table class="w-full min-w-[980px] text-left text-sm">
                     <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                         <tr>
+                            <th class="px-4 py-3">NO.</th>
                             <th class="px-4 py-3">Name</th>
                             <th class="px-4 py-3">Birthday</th>
                             <th class="px-4 py-3">Mom</th>
@@ -43,6 +44,7 @@
                     <tbody class="divide-y divide-slate-200">
                         @forelse ($members as $member)
                             <tr>
+                                <td class="px-4 py-3 font-black text-slate-500">{{ $loop->iteration }}</td>
                                 <td class="px-4 py-3 font-bold text-kiwi-ink">{{ $member->name }}</td>
                                 <td class="px-4 py-3 text-slate-700">{{ $member->birthday?->format('Y-m-d') ?: '-' }}</td>
                                 <td class="px-4 py-3 text-slate-700">{{ $member->mom_name ?: '-' }}</td>
@@ -59,7 +61,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td class="px-4 py-8 text-center font-semibold text-slate-500" colspan="10">
+                                <td class="px-4 py-8 text-center font-semibold text-slate-500" colspan="11">
                                     No members yet.
                                 </td>
                             </tr>
