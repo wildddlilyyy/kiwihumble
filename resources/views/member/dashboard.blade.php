@@ -127,8 +127,8 @@
                             <div class="overflow-hidden rounded-xl border border-slate-200">
                                 <div class="bg-kiwi-ink px-4 py-2 font-black text-kiwi-gold">吸濕排汗 - 兒童 尺寸表/SIZE</div>
                                 <table class="w-full text-center text-sm">
-                                    <thead class="bg-slate-50 text-kiwi-blue">
-                                        <tr><th class="px-3 py-2"></th><th>#6</th><th>#8</th><th>#10</th></tr>
+                                    <thead class="bg-sky-100 text-kiwi-blue">
+                                        <tr class="h-12"><th class="px-3 py-3"></th><th class="px-3 py-3">#6</th><th class="px-3 py-3">#8</th><th class="px-3 py-3">#10</th></tr>
                                     </thead>
                                     <tbody class="divide-y divide-slate-200 font-bold">
                                         <tr><th class="px-3 py-2 text-left text-kiwi-blue">衣長</th><td>46</td><td>50</td><td>54</td></tr>
@@ -143,8 +143,8 @@
                                 <div class="bg-kiwi-ink px-4 py-2 font-black text-kiwi-gold">吸濕排汗 - 大人 尺寸表/SIZE（單位/cm）</div>
                                 <div class="overflow-x-auto">
                                     <table class="w-full min-w-[620px] text-center text-sm">
-                                        <thead class="bg-slate-50 text-kiwi-blue">
-                                            <tr><th class="px-3 py-2"></th><th>XS</th><th>S</th><th>M</th><th>L</th><th>XL</th><th>2L</th><th>3L</th><th>5L</th></tr>
+                                        <thead class="bg-sky-100 text-kiwi-blue">
+                                            <tr class="h-12"><th class="px-3 py-3"></th><th class="px-3 py-3">XS</th><th class="px-3 py-3">S</th><th class="px-3 py-3">M</th><th class="px-3 py-3">L</th><th class="px-3 py-3">XL</th><th class="px-3 py-3">2L</th><th class="px-3 py-3">3L</th><th class="px-3 py-3">5L</th></tr>
                                         </thead>
                                         <tbody class="divide-y divide-slate-200 font-bold">
                                             <tr><th class="px-3 py-2 text-left text-kiwi-blue">衣長</th><td>60</td><td>64</td><td>68</td><td>70</td><td>72</td><td>76</td><td>80</td><td>84</td></tr>
