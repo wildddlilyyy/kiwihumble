@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\ClassShirtOrder;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -186,5 +187,56 @@ class AdminAccessTest extends TestCase
             ->get('/backend/members')
             ->assertOk()
             ->assertSee('family-secret');
+    }
+
+    public function test_backend_members_list_shows_class_shirt_quantity(): void
+    {
+        $this->seed();
+        $admin = User::query()->where('is_admin', true)->firstOrFail();
+        $member = User::factory()->create([
+            'name' => 'Liam',
+            'is_admin' => false,
+        ]);
+
+        ClassShirtOrder::query()->create([
+            'user_id' => $member->id,
+            'category' => 'adult',
+            'size' => 'L',
+            'quantity' => 3,
+            'submitted_at' => now(),
+        ]);
+
+        $this->actingAs($admin, 'backend')
+            ->get('/backend/members')
+            ->assertOk()
+            ->assertSee('Shirts')
+            ->assertSee('3');
+    }
+
+    public function test_backend_can_export_class_shirt_orders_xlsx(): void
+    {
+        if (! class_exists(\ZipArchive::class)) {
+            $this->markTestSkipped('The local PHP zip extension is required to generate xlsx files.');
+        }
+
+        $this->seed();
+        $admin = User::query()->where('is_admin', true)->firstOrFail();
+        $member = User::factory()->create([
+            'name' => 'Liam',
+            'is_admin' => false,
+        ]);
+
+        ClassShirtOrder::query()->create([
+            'user_id' => $member->id,
+            'category' => 'adult',
+            'size' => 'L',
+            'quantity' => 3,
+            'submitted_at' => now(),
+        ]);
+
+        $this->actingAs($admin, 'backend')
+            ->get('/backend/class-shirt-orders/export')
+            ->assertOk()
+            ->assertHeader('content-type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     }
 }

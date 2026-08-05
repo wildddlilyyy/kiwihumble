@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\ClassShirtOrder;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -42,6 +43,20 @@ class MemberAccessTest extends TestCase
             ->assertSee('Mom Lily')
             ->assertSee('Dad Lily')
             ->assertSee('0922333444');
+    }
+
+    public function test_member_dashboard_shows_profile_and_class_shirt_tabs(): void
+    {
+        $member = User::factory()->create(['is_admin' => false]);
+
+        $this->actingAs($member, 'member')
+            ->get('/member')
+            ->assertOk()
+            ->assertSee('個人資訊')
+            ->assertSee('班服訂購登記')
+            ->assertSee('吸濕排汗 - 兒童')
+            ->assertSee('吸濕排汗 - 大人')
+            ->assertSee('Humble 校慶版班服示意圖');
     }
 
     public function test_admin_cannot_login_through_member_login(): void
@@ -87,6 +102,82 @@ class MemberAccessTest extends TestCase
             'mom_phone' => '0912345678',
             'dad_name' => 'Dad New',
             'dad_phone' => '0922333444',
+        ]);
+    }
+
+    public function test_member_can_create_update_and_delete_class_shirt_order(): void
+    {
+        $member = User::factory()->create(['is_admin' => false]);
+
+        $this->actingAs($member, 'member')
+            ->post('/member/class-shirt-orders', [
+                'category' => 'child',
+                'size' => '#8',
+                'quantity' => 2,
+            ])
+            ->assertRedirect('/member?tab=class-shirt');
+
+        $order = ClassShirtOrder::query()->where('user_id', $member->id)->firstOrFail();
+
+        $this->assertDatabaseHas('class_shirt_orders', [
+            'id' => $order->id,
+            'category' => 'child',
+            'size' => '#8',
+            'quantity' => 2,
+        ]);
+
+        $this->actingAs($member, 'member')
+            ->put("/member/class-shirt-orders/{$order->id}", [
+                'category' => 'adult',
+                'size' => 'L',
+                'quantity' => 3,
+            ])
+            ->assertRedirect('/member?tab=class-shirt');
+
+        $this->assertDatabaseHas('class_shirt_orders', [
+            'id' => $order->id,
+            'category' => 'adult',
+            'size' => 'L',
+            'quantity' => 3,
+        ]);
+
+        $this->actingAs($member, 'member')
+            ->delete("/member/class-shirt-orders/{$order->id}")
+            ->assertRedirect('/member?tab=class-shirt');
+
+        $this->assertDatabaseMissing('class_shirt_orders', [
+            'id' => $order->id,
+        ]);
+    }
+
+    public function test_member_cannot_update_or_delete_another_members_class_shirt_order(): void
+    {
+        $member = User::factory()->create(['is_admin' => false]);
+        $otherMember = User::factory()->create(['is_admin' => false]);
+        $order = ClassShirtOrder::query()->create([
+            'user_id' => $otherMember->id,
+            'category' => 'adult',
+            'size' => 'M',
+            'quantity' => 1,
+            'submitted_at' => now(),
+        ]);
+
+        $this->actingAs($member, 'member')
+            ->put("/member/class-shirt-orders/{$order->id}", [
+                'category' => 'adult',
+                'size' => 'L',
+                'quantity' => 2,
+            ])
+            ->assertNotFound();
+
+        $this->actingAs($member, 'member')
+            ->delete("/member/class-shirt-orders/{$order->id}")
+            ->assertNotFound();
+
+        $this->assertDatabaseHas('class_shirt_orders', [
+            'id' => $order->id,
+            'size' => 'M',
+            'quantity' => 1,
         ]);
     }
 

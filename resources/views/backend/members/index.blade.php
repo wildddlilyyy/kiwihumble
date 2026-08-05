@@ -11,6 +11,9 @@
                     <a class="rounded-lg px-4 py-2 text-sm font-black text-kiwi-blue hover:bg-slate-100" href="{{ route('backend.dashboard') }}">
                         Dashboard
                     </a>
+                    <a class="rounded-lg border border-kiwi-blue px-4 py-2 text-sm font-black text-kiwi-blue hover:bg-slate-100" href="{{ route('backend.class-shirt-orders.export') }}">
+                        Export Shirts
+                    </a>
                     <a class="rounded-lg bg-kiwi-blue px-4 py-2 text-sm font-black text-white hover:bg-kiwi-ink" href="{{ route('backend.members.create') }}">
                         Add Member
                     </a>
@@ -26,7 +29,7 @@
             @endif
 
             <div class="overflow-x-auto rounded-xl bg-white shadow-sm ring-1 ring-black/5">
-                <table class="w-full min-w-[980px] text-left text-sm">
+                <table class="w-full min-w-[1080px] text-left text-sm">
                     <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                         <tr>
                             <th class="px-4 py-3">NO.</th>
@@ -36,6 +39,7 @@
                             <th class="px-4 py-3">Mom Phone</th>
                             <th class="px-4 py-3">Dad</th>
                             <th class="px-4 py-3">Dad Phone</th>
+                            <th class="px-4 py-3">Shirts</th>
                             <th class="px-4 py-3">Password</th>
                             <th class="px-4 py-3">Updated</th>
                             <th class="px-4 py-3 text-right">Action</th>
@@ -51,6 +55,7 @@
                                 <td class="px-4 py-3 text-slate-700">{{ $member->mom_phone ?: '-' }}</td>
                                 <td class="px-4 py-3 text-slate-700">{{ $member->dad_name ?: '-' }}</td>
                                 <td class="px-4 py-3 text-slate-700">{{ $member->dad_phone ?: '-' }}</td>
+                                <td class="px-4 py-3 font-black text-kiwi-blue">{{ $member->class_shirt_quantity ?? 0 }}</td>
                                 <td class="px-4 py-3 font-bold text-amber-700">{{ $member->login_password ?: '-' }}</td>
                                 <td class="px-4 py-3 text-slate-500">{{ $member->updated_at?->format('Y-m-d') }}</td>
                                 <td class="px-4 py-3 text-right">
@@ -61,7 +66,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td class="px-4 py-8 text-center font-semibold text-slate-500" colspan="11">
+                                <td class="px-4 py-8 text-center font-semibold text-slate-500" colspan="12">
                                     No members yet.
                                 </td>
                             </tr>
