@@ -8,16 +8,18 @@
             <h1 class="text-2xl font-black tracking-normal text-kiwi-ink">Backend Login</h1>
             <p class="mt-2 text-sm font-semibold text-slate-600">Admin access for KIWI HUMBLE.</p>
 
-            <form method="POST" action="{{ route('backend.login.store') }}" class="mt-8 space-y-5">
+            <form method="POST" action="{{ route('backend.login.store') }}" class="mt-8 space-y-5" data-remember-login-form="backend">
                 @csrf
 
                 <label class="block">
                     <span class="text-sm font-bold text-slate-700">Email</span>
                     <input
+                        data-remember-login-input
                         class="mt-2 w-full rounded-lg border-slate-300 focus:border-kiwi-blue focus:ring-kiwi-blue"
                         type="email"
                         name="email"
                         value="{{ old('email') }}"
+                        autocomplete="username"
                         required
                         autofocus
                     >
@@ -31,6 +33,7 @@
                             class="w-full rounded-l-lg border-0 focus:ring-0"
                             type="password"
                             name="password"
+                            autocomplete="current-password"
                             required
                         >
                         <button class="px-3 text-sm font-black text-kiwi-blue" type="button" data-password-toggle="#backend-password" aria-pressed="false">
@@ -40,7 +43,7 @@
                 </label>
 
                 <label class="flex items-center gap-2 text-sm text-slate-600">
-                    <input class="rounded border-slate-300 text-kiwi-blue focus:ring-kiwi-blue" type="checkbox" name="remember" value="1">
+                    <input data-remember-login-checkbox class="rounded border-slate-300 text-kiwi-blue focus:ring-kiwi-blue" type="checkbox" name="remember" value="1" @checked(old('remember'))>
                     Remember me
                 </label>
 

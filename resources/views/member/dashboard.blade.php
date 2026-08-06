@@ -198,9 +198,17 @@
                                         <label class="block">
                                             <span class="text-sm font-bold text-slate-700">尺寸</span>
                                             <select class="mt-2 w-full rounded-lg border-slate-300 focus:border-kiwi-blue focus:ring-kiwi-blue" x-model="item.size">
-                                                <template x-for="size in sizeOptions[item.category]" :key="size">
-                                                    <option :value="size" x-text="size"></option>
-                                                </template>
+                                                <option value="#6" x-show="item.category === 'child'">#6</option>
+                                                <option value="#8" x-show="item.category === 'child'">#8</option>
+                                                <option value="#10" x-show="item.category === 'child'">#10</option>
+                                                <option value="XS" x-show="item.category === 'adult'">XS</option>
+                                                <option value="S" x-show="item.category === 'adult'">S</option>
+                                                <option value="M" x-show="item.category === 'adult'">M</option>
+                                                <option value="L" x-show="item.category === 'adult'">L</option>
+                                                <option value="XL" x-show="item.category === 'adult'">XL</option>
+                                                <option value="2L" x-show="item.category === 'adult'">2L</option>
+                                                <option value="3L" x-show="item.category === 'adult'">3L</option>
+                                                <option value="5L" x-show="item.category === 'adult'">5L</option>
                                             </select>
                                         </label>
 

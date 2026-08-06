@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\ClassShirtOrder;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
@@ -43,6 +44,23 @@ class MemberAccessTest extends TestCase
             ->assertSee('Mom Lily')
             ->assertSee('Dad Lily')
             ->assertSee('0922333444');
+    }
+
+    public function test_member_login_remember_me_sets_recaller_cookie(): void
+    {
+        User::factory()->create([
+            'name' => 'Lily Family',
+            'password' => Hash::make('member-password'),
+            'is_admin' => false,
+        ]);
+
+        $this->post('/member/login', [
+            'name' => 'Lily Family',
+            'password' => 'member-password',
+            'remember' => '1',
+        ])
+            ->assertRedirect('/member')
+            ->assertCookie(Auth::guard('member')->getRecallerName());
     }
 
     public function test_member_dashboard_shows_profile_and_class_shirt_tabs(): void

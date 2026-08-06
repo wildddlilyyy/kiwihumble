@@ -50,6 +50,32 @@ document.querySelectorAll("[data-password-toggle]").forEach((button) => {
   });
 });
 
+document.querySelectorAll("[data-remember-login-form]").forEach((form) => {
+  const input = form.querySelector("[data-remember-login-input]");
+  const checkbox = form.querySelector("[data-remember-login-checkbox]");
+  const key = `kiwi:${form.dataset.rememberLoginForm}:login`;
+
+  if (!input || !checkbox) {
+    return;
+  }
+
+  const rememberedValue = window.localStorage.getItem(key);
+
+  if (rememberedValue && !input.value) {
+    input.value = rememberedValue;
+    checkbox.checked = true;
+  }
+
+  form.addEventListener("submit", () => {
+    if (checkbox.checked) {
+      window.localStorage.setItem(key, input.value);
+      return;
+    }
+
+    window.localStorage.removeItem(key);
+  });
+});
+
 window.classShirtOrderForm = function classShirtOrderForm(config) {
   return {
     items: (config.items ?? []).map((item) => ({
