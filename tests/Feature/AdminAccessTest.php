@@ -116,6 +116,26 @@ class AdminAccessTest extends TestCase
             ->assertSessionHasErrors('name');
     }
 
+    public function test_admin_can_create_member_with_short_or_special_character_password(): void
+    {
+        $this->seed();
+        $admin = User::query()->where('is_admin', true)->firstOrFail();
+
+        $this->actingAs($admin, 'backend')
+            ->post('/backend/members', [
+                'name' => 'Short Password Member',
+                'password' => 'M!',
+                'password_confirmation' => 'M!',
+            ])
+            ->assertRedirect('/backend/members');
+
+        $this->assertDatabaseHas('users', [
+            'name' => 'Short Password Member',
+            'login_password' => 'M!',
+            'is_admin' => false,
+        ]);
+    }
+
     public function test_admin_can_update_member_profile(): void
     {
         $this->seed();

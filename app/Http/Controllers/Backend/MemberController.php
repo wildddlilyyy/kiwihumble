@@ -36,7 +36,7 @@ class MemberController
             'mom_phone' => ['nullable', 'string', 'max:40'],
             'dad_name' => ['nullable', 'string', 'max:120'],
             'dad_phone' => ['nullable', 'string', 'max:40'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password' => ['required', 'string', 'confirmed'],
         ]);
 
         User::query()->create([
@@ -91,7 +91,7 @@ class MemberController
         $this->ensureMember($member);
 
         $validated = $request->validate([
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password' => ['required', 'string', 'confirmed'],
         ]);
 
         $member->update([
