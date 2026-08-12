@@ -140,9 +140,21 @@
                                                     x-model="row.size"
                                                     x-bind:name="'items[' + index + '][size]'"
                                                 >
-                                                    <template x-for="size in (row.category === 'adult' ? adultSizes : childSizes)" :key="size">
-                                                        <option x-bind:value="size" x-text="size"></option>
-                                                    </template>
+                                                    <optgroup label="Child">
+                                                        <option value="#6">#6</option>
+                                                        <option value="#8">#8</option>
+                                                        <option value="#10">#10</option>
+                                                    </optgroup>
+                                                    <optgroup label="Adult">
+                                                        <option value="XS">XS</option>
+                                                        <option value="S">S</option>
+                                                        <option value="M">M</option>
+                                                        <option value="L">L</option>
+                                                        <option value="XL">XL</option>
+                                                        <option value="2L">2L</option>
+                                                        <option value="3L">3L</option>
+                                                        <option value="5L">5L</option>
+                                                    </optgroup>
                                                 </select>
                                             </td>
                                             <td class="px-4 py-3">
