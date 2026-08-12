@@ -5,9 +5,12 @@
         data-target-date="{{ $tripDate }}T00:00:00+08:00"
         data-timezone="{{ $timezone }}"
     >
-        <section class="grid min-h-screen place-items-center px-6 py-10">
-            <div class="w-full max-w-5xl text-center">
-                <div class="mx-auto w-[min(68vw,320px)] sm:w-[min(46vw,380px)]">
+        <section class="relative grid min-h-screen place-items-center overflow-hidden px-6 py-10">
+            <div class="kiwi-parallax-orb kiwi-parallax-orb--one" data-parallax="-0.08" aria-hidden="true"></div>
+            <div class="kiwi-parallax-orb kiwi-parallax-orb--two" data-parallax="0.12" aria-hidden="true"></div>
+
+            <div class="relative z-10 w-full max-w-5xl text-center" data-parallax="-0.035">
+                <div class="mx-auto w-[min(68vw,320px)] sm:w-[min(46vw,380px)]" data-parallax="-0.08">
                     <x-kiwi-loader />
                 </div>
 

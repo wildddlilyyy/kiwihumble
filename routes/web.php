@@ -45,6 +45,8 @@ Route::middleware(['auth:backend', 'admin'])->prefix('backend')->name('backend.'
     Route::get('/members', [BackendMemberController::class, 'index'])->name('members.index');
     Route::get('/members/create', [BackendMemberController::class, 'create'])->name('members.create');
     Route::post('/members', [BackendMemberController::class, 'store'])->name('members.store');
+    Route::get('/members/{member}/class-shirt-order', [BackendMemberController::class, 'showClassShirtOrder'])->name('members.class-shirt-order');
+    Route::put('/members/{member}/class-shirt-order', [BackendMemberController::class, 'updateClassShirtOrder'])->name('members.class-shirt-order.update');
     Route::get('/members/{member}/edit', [BackendMemberController::class, 'edit'])->name('members.edit');
     Route::put('/members/{member}', [BackendMemberController::class, 'update'])->name('members.update');
     Route::post('/members/{member}/password', [BackendMemberController::class, 'updatePassword'])->name('members.password.update');

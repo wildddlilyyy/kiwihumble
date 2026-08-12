@@ -12,10 +12,29 @@
   .kiwi-grid-bg {
     background-color: #182d5b;
     background-image:
-      linear-gradient(rgba(255, 247, 223, .075) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 247, 223, .075) 1px, transparent 1px),
+      linear-gradient(rgba(255, 247, 223, .05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 247, 223, .05) 1px, transparent 1px),
       radial-gradient(circle at 50% 20%, rgba(240, 166, 36, .14), transparent 34rem);
     background-size: 34px 34px, 34px 34px, 100% 100%;
+  }
+
+  .kiwi-parallax-orb {
+    @apply pointer-events-none absolute rounded-full blur-3xl;
+    inline-size: clamp(13rem, 30vw, 28rem);
+    block-size: clamp(13rem, 30vw, 28rem);
+    opacity: .25;
+    will-change: transform;
+  }
+
+  .kiwi-parallax-orb--one {
+    background: #2d5f9f;
+    inset: 10% auto auto -10%;
+  }
+
+  .kiwi-parallax-orb--two {
+    background: #d0952c;
+    inset: auto -10% 5% auto;
+    opacity: .16;
   }
 
   .count-card {
@@ -30,6 +49,7 @@
   .count-label {
     @apply mt-2 block font-hand text-lg text-kiwi-gold;
   }
+
 }
 
 .kiwi-loader {
@@ -124,6 +144,10 @@
 
   .kiwi-loader__bg {
     animation: kiwi-reduced-pulse 4s ease-in-out infinite;
+  }
+
+  .kiwi-parallax-orb {
+    transform: none !important;
   }
 }
 

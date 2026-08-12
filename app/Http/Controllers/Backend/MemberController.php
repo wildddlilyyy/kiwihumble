@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class MemberController
 {
@@ -66,6 +67,40 @@ class MemberController
         ]);
     }
 
+    public function showClassShirtOrder(User $member): View
+    {
+        $this->ensureMember($member);
+
+        return view('backend.members.class-shirt-order', [
+            'member' => $member->load('classShirtOrder'),
+        ]);
+    }
+
+    public function updateClassShirtOrder(Request $request, User $member): RedirectResponse
+    {
+        $this->ensureMember($member);
+
+        $items = $this->validatedClassShirtItems($request);
+        $existingOrder = $member->classShirtOrder;
+
+        if (empty($items)) {
+            $existingOrder?->delete();
+
+            return redirect()
+                ->route('backend.members.class-shirt-order', $member)
+                ->with('status', 'Shirt order updated.');
+        }
+
+        $member->classShirtOrder()->updateOrCreate([], [
+            'items' => $items,
+            'submitted_at' => $existingOrder?->submitted_at ?? now(),
+        ]);
+
+        return redirect()
+            ->route('backend.members.class-shirt-order', $member)
+            ->with('status', 'Shirt order updated.');
+    }
+
     public function update(Request $request, User $member): RedirectResponse
     {
         $this->ensureMember($member);
@@ -107,5 +142,42 @@ class MemberController
     private function ensureMember(User $user): void
     {
         abort_if($user->is_admin, 404);
+    }
+
+    private function validatedClassShirtItems(Request $request): array
+    {
+        $rawItems = collect($request->input('items', []))
+            ->filter(fn (array $item): bool => filled($item['size'] ?? null) || filled($item['quantity'] ?? null))
+            ->values()
+            ->all();
+
+        if (empty($rawItems)) {
+            return [];
+        }
+
+        validator(['items' => $rawItems], [
+            'items' => ['required', 'array', 'min:1', 'max:50'],
+            'items.*.category' => ['required', Rule::in(array_keys(\App\Models\ClassShirtOrder::CATEGORY_LABELS))],
+            'items.*.size' => ['required', 'string', 'max:20'],
+            'items.*.quantity' => ['required', 'integer', 'min:1', 'max:99'],
+        ])->validate();
+
+        $items = [];
+
+        foreach ($rawItems as $index => $item) {
+            if (! in_array($item['size'], \App\Models\ClassShirtOrder::SIZES[$item['category']], true)) {
+                throw ValidationException::withMessages([
+                    "items.{$index}.size" => 'Please choose a valid shirt size.',
+                ]);
+            }
+
+            $items[] = [
+                'category' => $item['category'],
+                'size' => $item['size'],
+                'quantity' => (int) $item['quantity'],
+            ];
+        }
+
+        return $items;
     }
 }

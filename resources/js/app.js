@@ -35,6 +35,42 @@ function mountCountdown(root) {
 
 document.querySelectorAll("[data-countdown]").forEach(mountCountdown);
 
+function mountParallax() {
+  const items = [...document.querySelectorAll("[data-parallax]")];
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  if (!items.length || reducedMotion.matches) {
+    return;
+  }
+
+  let frame = null;
+
+  const render = () => {
+    frame = null;
+
+    items.forEach((item) => {
+      const bounds = item.getBoundingClientRect();
+      const speed = Number(item.dataset.parallax || 0);
+      const distanceFromCenter = bounds.top + bounds.height / 2 - window.innerHeight / 2;
+      const offset = distanceFromCenter * speed;
+
+      item.style.transform = `translate3d(0, ${offset.toFixed(2)}px, 0)`;
+    });
+  };
+
+  const requestRender = () => {
+    if (frame === null) {
+      frame = window.requestAnimationFrame(render);
+    }
+  };
+
+  render();
+  window.addEventListener("scroll", requestRender, { passive: true });
+  window.addEventListener("resize", requestRender, { passive: true });
+}
+
+mountParallax();
+
 document.querySelectorAll("[data-password-toggle]").forEach((button) => {
   const input = document.querySelector(button.dataset.passwordToggle);
 

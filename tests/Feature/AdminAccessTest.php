@@ -230,7 +230,61 @@ class AdminAccessTest extends TestCase
             ->get('/backend/members')
             ->assertOk()
             ->assertSee('Shirts')
-            ->assertSee('3');
+            ->assertSee('3 pcs')
+            ->assertSee("/backend/members/{$member->id}/class-shirt-order", false);
+    }
+
+    public function test_backend_can_view_and_update_member_class_shirt_order(): void
+    {
+        $this->seed();
+        $admin = User::query()->where('is_admin', true)->firstOrFail();
+        $member = User::factory()->create([
+            'name' => 'Liam',
+            'is_admin' => false,
+        ]);
+
+        $order = ClassShirtOrder::query()->create([
+            'user_id' => $member->id,
+            'items' => [
+                ['category' => 'adult', 'size' => 'L', 'quantity' => 3],
+            ],
+            'submitted_at' => now()->subDay(),
+        ]);
+
+        $this->actingAs($admin, 'backend')
+            ->get("/backend/members/{$member->id}/class-shirt-order")
+            ->assertOk()
+            ->assertSee('Liam Shirt Order')
+            ->assertSee('3 pcs')
+            ->assertSee('Save Shirt Order');
+
+        $this->actingAs($admin, 'backend')
+            ->put("/backend/members/{$member->id}/class-shirt-order", [
+                'items' => [
+                    ['category' => 'child', 'size' => '#8', 'quantity' => 1],
+                    ['category' => 'adult', 'size' => 'XL', 'quantity' => 2],
+                    ['category' => 'child', 'size' => '', 'quantity' => ''],
+                ],
+            ])
+            ->assertRedirect("/backend/members/{$member->id}/class-shirt-order");
+
+        $order->refresh();
+
+        $this->assertSame([
+            ['category' => 'child', 'size' => '#8', 'quantity' => 1],
+            ['category' => 'adult', 'size' => 'XL', 'quantity' => 2],
+        ], $order->items);
+        $this->assertNotNull($order->submitted_at);
+
+        $this->actingAs($admin, 'backend')
+            ->put("/backend/members/{$member->id}/class-shirt-order", [
+                'items' => [],
+            ])
+            ->assertRedirect("/backend/members/{$member->id}/class-shirt-order");
+
+        $this->assertDatabaseMissing('class_shirt_orders', [
+            'id' => $order->id,
+        ]);
     }
 
     public function test_backend_can_export_class_shirt_orders_xlsx(): void
