@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Backend;
 
+use App\Models\ClassShirtOrder;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -91,9 +92,14 @@ class MemberController
                 ->with('status', 'Shirt order updated.');
         }
 
+        $payment = $this->validatedClassShirtPayment($request);
+
         $member->classShirtOrder()->updateOrCreate([], [
             'items' => $items,
             'submitted_at' => $existingOrder?->submitted_at ?? now(),
+            'payment_method' => $payment['payment_method'],
+            'payment_account_last_five' => $payment['payment_account_last_five'],
+            'payment_status' => $payment['payment_status'],
         ]);
 
         return redirect()
@@ -148,6 +154,11 @@ class MemberController
     {
         $rawItems = collect($request->input('items', []))
             ->filter(fn (array $item): bool => filled($item['size'] ?? null) || filled($item['quantity'] ?? null))
+            ->map(function (array $item): array {
+                $item['size'] = ClassShirtOrder::normalizeSize($item['size'] ?? null);
+
+                return $item;
+            })
             ->values()
             ->all();
 
@@ -157,7 +168,7 @@ class MemberController
 
         validator(['items' => $rawItems], [
             'items' => ['required', 'array', 'min:1', 'max:50'],
-            'items.*.category' => ['required', Rule::in(array_keys(\App\Models\ClassShirtOrder::CATEGORY_LABELS))],
+            'items.*.category' => ['required', Rule::in(array_keys(ClassShirtOrder::CATEGORY_LABELS))],
             'items.*.size' => ['required', 'string', 'max:20'],
             'items.*.quantity' => ['required', 'integer', 'min:1', 'max:99'],
         ])->validate();
@@ -165,7 +176,7 @@ class MemberController
         $items = [];
 
         foreach ($rawItems as $index => $item) {
-            if (! in_array($item['size'], \App\Models\ClassShirtOrder::SIZES[$item['category']], true)) {
+            if (! in_array($item['size'], ClassShirtOrder::SIZES[$item['category']], true)) {
                 throw ValidationException::withMessages([
                     "items.{$index}.size" => 'Please choose a valid shirt size.',
                 ]);
@@ -179,5 +190,29 @@ class MemberController
         }
 
         return $items;
+    }
+
+    private function validatedClassShirtPayment(Request $request): array
+    {
+        $validated = $request->validate([
+            'payment_method' => ['required', Rule::in(array_keys(ClassShirtOrder::PAYMENT_METHOD_LABELS))],
+            'payment_account_last_five' => [
+                'nullable',
+                'required_if:payment_method,'.ClassShirtOrder::PAYMENT_METHOD_TRANSFER,
+                'digits:5',
+            ],
+            'payment_status' => ['required', Rule::in(array_keys(ClassShirtOrder::PAYMENT_STATUS_LABELS))],
+        ], [
+            'payment_account_last_five.required_if' => 'Transfer orders require the account last five digits.',
+            'payment_account_last_five.digits' => 'Account last five digits must be exactly 5 numbers.',
+        ]);
+
+        return [
+            'payment_method' => $validated['payment_method'],
+            'payment_account_last_five' => $validated['payment_method'] === ClassShirtOrder::PAYMENT_METHOD_TRANSFER
+                ? $validated['payment_account_last_five']
+                : null,
+            'payment_status' => $validated['payment_status'],
+        ];
     }
 }

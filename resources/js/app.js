@@ -116,19 +116,31 @@ window.classShirtOrderForm = function classShirtOrderForm(config) {
   return {
     items: (config.items ?? []).map((item) => ({
       category: item.category ?? "child",
-      size: item.size ?? "#6",
+      size: item.size === "#6" ? "#6熱轉印" : item.size ?? "#6熱轉印",
       quantity: Number(item.quantity ?? 1),
     })),
     submittedAt: config.submittedAt,
+    paymentMethod: config.paymentMethod ?? "transfer",
+    paymentAccountLastFive: config.paymentAccountLastFive ?? "",
+    paymentStatusLabel: config.paymentStatusLabel ?? "尚未付款",
     status: "",
     error: "",
     isSaving: false,
+    unitPrice: 300,
+    categoryLabels: {
+      child: "兒童",
+      adult: "成人",
+    },
+    paymentMethodLabels: {
+      cash: "現金",
+      transfer: "匯款",
+    },
     sizeOptions: {
-      child: ["#6", "#8", "#10"],
+      child: ["#6熱轉印", "#8", "#10"],
       adult: ["XS", "S", "M", "L", "XL", "2L", "3L", "5L"],
     },
     addItem() {
-      this.items.push({ category: "child", size: "#6", quantity: 1 });
+      this.items.push({ category: "child", size: "#6熱轉印", quantity: 1 });
       this.status = "";
       this.error = "";
     },
@@ -145,12 +157,28 @@ window.classShirtOrderForm = function classShirtOrderForm(config) {
     totalQuantity() {
       return this.items.reduce((total, item) => total + Number(item.quantity || 0), 0);
     },
+    totalAmount() {
+      return this.totalQuantity() * this.unitPrice;
+    },
+    formatCurrency(amount) {
+      return `NT$ ${Number(amount || 0).toLocaleString("zh-TW")}`;
+    },
     async submit() {
       this.status = "";
       this.error = "";
 
+      if (this.submittedAt) {
+        this.error = "班服訂單已送出，如需修改請聯繫管理者。";
+        return;
+      }
+
       if (this.items.length === 0) {
-        this.error = "請先新增至少一個班服品項。";
+        this.error = "請至少新增一筆班服訂購內容。";
+        return;
+      }
+
+      if (this.paymentMethod === "transfer" && !/^\d{5}$/.test(this.paymentAccountLastFive)) {
+        this.error = "選擇匯款時，請填寫 5 碼帳號末五碼。";
         return;
       }
 
@@ -164,7 +192,12 @@ window.classShirtOrderForm = function classShirtOrderForm(config) {
             Accept: "application/json",
             "X-CSRF-TOKEN": config.csrfToken,
           },
-          body: JSON.stringify({ items: this.items }),
+          body: JSON.stringify({
+            items: this.items,
+            payment_method: this.paymentMethod,
+            payment_account_last_five:
+              this.paymentMethod === "transfer" ? this.paymentAccountLastFive : null,
+          }),
         });
 
         const data = await response.json();
@@ -175,6 +208,9 @@ window.classShirtOrderForm = function classShirtOrderForm(config) {
 
         this.items = data.items;
         this.submittedAt = data.submitted_at;
+        this.paymentMethod = data.payment_method;
+        this.paymentAccountLastFive = data.payment_account_last_five ?? "";
+        this.paymentStatusLabel = data.payment_status_label;
         this.status = data.status;
       } catch (error) {
         this.error = error.message;

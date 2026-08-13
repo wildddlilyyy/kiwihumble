@@ -22,7 +22,7 @@ class ClassShirtOrderExportController
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Class Shirt Orders');
         $sheet->fromArray([
-            ['NO', '會員 Name', '類別', '尺寸', '數量', '送出時間', '更新時間'],
+            ['NO', 'Name', '類別', '尺寸', '數量', '總金額', '付款方式', '帳號末五碼', '付款狀態', 'Submitted', 'Updated'],
         ]);
 
         $row = 2;
@@ -34,8 +34,12 @@ class ClassShirtOrderExportController
                     $number,
                     $order->user?->name,
                     ClassShirtOrder::categoryLabel($item['category'] ?? ''),
-                    $item['size'] ?? '',
+                    ClassShirtOrder::normalizeSize($item['size'] ?? ''),
                     $item['quantity'] ?? '',
+                    $order->totalAmount(),
+                    $order->payment_method_label,
+                    $order->payment_account_last_five,
+                    $order->payment_status_label,
                     $order->submitted_at?->timezone(config('app.timezone'))->format('Y-m-d H:i:s'),
                     $order->updated_at?->timezone(config('app.timezone'))->format('Y-m-d H:i:s'),
                 ]], null, 'A'.$row);
@@ -45,7 +49,7 @@ class ClassShirtOrderExportController
             }
         }
 
-        foreach (range('A', 'G') as $column) {
+        foreach (range('A', 'K') as $column) {
             $sheet->getColumnDimension($column)->setAutoSize(true);
         }
 

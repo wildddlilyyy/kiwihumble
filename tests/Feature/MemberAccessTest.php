@@ -70,11 +70,11 @@ class MemberAccessTest extends TestCase
         $this->actingAs($member, 'member')
             ->get('/member')
             ->assertOk()
-            ->assertSee('個人資訊')
-            ->assertSee('班服訂購登記')
-            ->assertSee('吸濕排汗 - 兒童')
-            ->assertSee('吸濕排汗 - 大人')
-            ->assertSee('Humble 校慶版班服示意圖');
+            ->assertSee('家長資料')
+            ->assertSee('班服訂購')
+            ->assertSee('班服尺寸 - 兒童')
+            ->assertSee('班服尺寸 - 成人')
+            ->assertSee('Humble 班服尺寸表');
     }
 
     public function test_admin_cannot_login_through_member_login(): void
@@ -122,54 +122,92 @@ class MemberAccessTest extends TestCase
         ]);
     }
 
-    public function test_member_can_submit_and_replace_single_class_shirt_order(): void
+    public function test_member_can_submit_transfer_class_shirt_order_once(): void
     {
         $member = User::factory()->create(['is_admin' => false]);
 
         $this->actingAs($member, 'member')
             ->postJson('/member/class-shirt-order', [
                 'items' => [
-                    ['category' => 'child', 'size' => '#8', 'quantity' => 2],
+                    ['category' => 'child', 'size' => '#6', 'quantity' => 2],
                     ['category' => 'adult', 'size' => 'L', 'quantity' => 1],
                 ],
+                'payment_method' => 'transfer',
+                'payment_account_last_five' => '40132',
             ])
             ->assertOk()
-            ->assertJsonPath('status', '班服訂單已送出。')
-            ->assertJsonPath('items.0.size', '#8');
+            ->assertJsonPath('status', '班服訂單已送出，付款待確認。')
+            ->assertJsonPath('items.0.size', '#6熱轉印')
+            ->assertJsonPath('payment_method_label', '匯款')
+            ->assertJsonPath('payment_status_label', '付款待確認')
+            ->assertJsonPath('total_quantity', 3)
+            ->assertJsonPath('total_amount', 900);
 
         $order = ClassShirtOrder::query()->where('user_id', $member->id)->firstOrFail();
 
         $this->assertSame(1, ClassShirtOrder::query()->where('user_id', $member->id)->count());
         $this->assertSame([
-            ['category' => 'child', 'size' => '#8', 'quantity' => 2],
+            ['category' => 'child', 'size' => '#6熱轉印', 'quantity' => 2],
             ['category' => 'adult', 'size' => 'L', 'quantity' => 1],
         ], $order->items);
+        $this->assertSame('transfer', $order->payment_method);
+        $this->assertSame('40132', $order->payment_account_last_five);
+        $this->assertSame('pending', $order->payment_status);
+        $this->assertSame(900, $order->totalAmount());
+        $this->assertNotNull($order->submitted_at);
 
         $this->actingAs($member, 'member')
             ->postJson('/member/class-shirt-order', [
                 'items' => [
                     ['category' => 'adult', 'size' => 'XL', 'quantity' => 3],
                 ],
+                'payment_method' => 'cash',
             ])
-            ->assertOk()
-            ->assertJsonPath('items.0.size', 'XL');
-
-        $order->refresh();
-
-        $this->assertSame(1, ClassShirtOrder::query()->where('user_id', $member->id)->count());
-        $this->assertSame([
-            ['category' => 'adult', 'size' => 'XL', 'quantity' => 3],
-        ], $order->items);
-        $this->assertNotNull($order->submitted_at);
+            ->assertForbidden();
 
         $this->actingAs($member, 'member')
             ->deleteJson('/member/class-shirt-order')
-            ->assertOk()
-            ->assertJsonPath('items', []);
+            ->assertForbidden();
+    }
 
-        $this->assertDatabaseMissing('class_shirt_orders', [
-            'id' => $order->id,
+    public function test_member_can_submit_cash_class_shirt_order_without_last_five(): void
+    {
+        $member = User::factory()->create(['is_admin' => false]);
+
+        $this->actingAs($member, 'member')
+            ->postJson('/member/class-shirt-order', [
+                'items' => [
+                    ['category' => 'adult', 'size' => 'M', 'quantity' => 1],
+                ],
+                'payment_method' => 'cash',
+            ])
+            ->assertOk()
+            ->assertJsonPath('payment_method_label', '現金')
+            ->assertJsonPath('payment_account_last_five', null)
+            ->assertJsonPath('payment_status_label', '付款待確認');
+
+        $this->assertDatabaseHas('class_shirt_orders', [
+            'user_id' => $member->id,
+            'payment_method' => 'cash',
+            'payment_account_last_five' => null,
+            'payment_status' => 'pending',
         ]);
+    }
+
+    public function test_member_transfer_order_requires_last_five_digits(): void
+    {
+        $member = User::factory()->create(['is_admin' => false]);
+
+        $this->actingAs($member, 'member')
+            ->postJson('/member/class-shirt-order', [
+                'items' => [
+                    ['category' => 'adult', 'size' => 'M', 'quantity' => 1],
+                ],
+                'payment_method' => 'transfer',
+                'payment_account_last_five' => '1234',
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('payment_account_last_five');
     }
 
     public function test_member_cannot_submit_invalid_class_shirt_size(): void
@@ -181,6 +219,7 @@ class MemberAccessTest extends TestCase
                 'items' => [
                     ['category' => 'child', 'size' => 'L', 'quantity' => 1],
                 ],
+                'payment_method' => 'cash',
             ])
             ->assertUnprocessable()
             ->assertJsonValidationErrors('items.0.size');
@@ -196,6 +235,8 @@ class MemberAccessTest extends TestCase
                 ['category' => 'adult', 'size' => 'M', 'quantity' => 1],
             ],
             'submitted_at' => now(),
+            'payment_method' => 'cash',
+            'payment_status' => 'pending',
         ]);
 
         $this->actingAs($member, 'member')
@@ -203,6 +244,7 @@ class MemberAccessTest extends TestCase
                 'items' => [
                     ['category' => 'adult', 'size' => 'L', 'quantity' => 2],
                 ],
+                'payment_method' => 'cash',
             ])
             ->assertOk();
 
@@ -211,6 +253,31 @@ class MemberAccessTest extends TestCase
         $this->assertSame([
             ['category' => 'adult', 'size' => 'M', 'quantity' => 1],
         ], $otherOrder->items);
+    }
+
+    public function test_member_dashboard_shows_submitted_order_as_read_only(): void
+    {
+        $member = User::factory()->create(['is_admin' => false]);
+
+        ClassShirtOrder::query()->create([
+            'user_id' => $member->id,
+            'items' => [
+                ['category' => 'adult', 'size' => 'M', 'quantity' => 1],
+            ],
+            'submitted_at' => now(),
+            'payment_method' => 'transfer',
+            'payment_account_last_five' => '40132',
+            'payment_status' => 'pending',
+        ]);
+
+        $this->actingAs($member, 'member')
+            ->get('/member?tab=class-shirt')
+            ->assertOk()
+            ->assertSee('訂單已送出，如需修改訂購內容請聯繫管理者。')
+            ->assertSee('付款待確認')
+            ->assertSee('40132')
+            ->assertDontSee('送出班服訂單')
+            ->assertDontSee('刪除');
     }
 
     public function test_backend_and_member_logins_can_exist_in_same_session(): void

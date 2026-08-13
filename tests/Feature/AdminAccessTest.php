@@ -209,7 +209,7 @@ class AdminAccessTest extends TestCase
             ->assertSee('family-secret');
     }
 
-    public function test_backend_members_list_shows_class_shirt_quantity(): void
+    public function test_backend_members_list_shows_class_shirt_payment_summary(): void
     {
         $this->seed();
         $admin = User::query()->where('is_admin', true)->firstOrFail();
@@ -224,6 +224,9 @@ class AdminAccessTest extends TestCase
                 ['category' => 'adult', 'size' => 'L', 'quantity' => 3],
             ],
             'submitted_at' => now(),
+            'payment_method' => 'transfer',
+            'payment_account_last_five' => '40132',
+            'payment_status' => 'pending',
         ]);
 
         $this->actingAs($admin, 'backend')
@@ -231,10 +234,14 @@ class AdminAccessTest extends TestCase
             ->assertOk()
             ->assertSee('Shirts')
             ->assertSee('3 pcs')
+            ->assertSee('NT$ 900')
+            ->assertSee('匯款')
+            ->assertSee('40132')
+            ->assertSee('付款待確認')
             ->assertSee("/backend/members/{$member->id}/class-shirt-order", false);
     }
 
-    public function test_backend_can_view_and_update_member_class_shirt_order(): void
+    public function test_backend_can_view_and_update_member_class_shirt_order_with_payment(): void
     {
         $this->seed();
         $admin = User::query()->where('is_admin', true)->firstOrFail();
@@ -249,32 +256,44 @@ class AdminAccessTest extends TestCase
                 ['category' => 'adult', 'size' => 'L', 'quantity' => 3],
             ],
             'submitted_at' => now()->subDay(),
+            'payment_method' => 'cash',
+            'payment_status' => 'unpaid',
         ]);
+        $submittedAt = $order->submitted_at;
 
         $this->actingAs($admin, 'backend')
             ->get("/backend/members/{$member->id}/class-shirt-order")
             ->assertOk()
             ->assertSee('Liam Shirt Order')
             ->assertSee('3 pcs')
+            ->assertSee('NT$ 900')
+            ->assertSee('尚未付款')
             ->assertSee('Save Shirt Order');
 
         $this->actingAs($admin, 'backend')
             ->put("/backend/members/{$member->id}/class-shirt-order", [
                 'items' => [
-                    ['category' => 'child', 'size' => '#8', 'quantity' => 1],
+                    ['category' => 'child', 'size' => '#6', 'quantity' => 1],
                     ['category' => 'adult', 'size' => 'XL', 'quantity' => 2],
                     ['category' => 'child', 'size' => '', 'quantity' => ''],
                 ],
+                'payment_method' => 'transfer',
+                'payment_account_last_five' => '40132',
+                'payment_status' => 'completed',
             ])
             ->assertRedirect("/backend/members/{$member->id}/class-shirt-order");
 
         $order->refresh();
 
         $this->assertSame([
-            ['category' => 'child', 'size' => '#8', 'quantity' => 1],
+            ['category' => 'child', 'size' => '#6熱轉印', 'quantity' => 1],
             ['category' => 'adult', 'size' => 'XL', 'quantity' => 2],
         ], $order->items);
-        $this->assertNotNull($order->submitted_at);
+        $this->assertSame('transfer', $order->payment_method);
+        $this->assertSame('40132', $order->payment_account_last_five);
+        $this->assertSame('completed', $order->payment_status);
+        $this->assertSame(900, $order->totalAmount());
+        $this->assertTrue($order->submitted_at->equalTo($submittedAt));
 
         $this->actingAs($admin, 'backend')
             ->put("/backend/members/{$member->id}/class-shirt-order", [
@@ -285,6 +304,26 @@ class AdminAccessTest extends TestCase
         $this->assertDatabaseMissing('class_shirt_orders', [
             'id' => $order->id,
         ]);
+    }
+
+    public function test_backend_transfer_order_requires_last_five_digits(): void
+    {
+        $this->seed();
+        $admin = User::query()->where('is_admin', true)->firstOrFail();
+        $member = User::factory()->create(['is_admin' => false]);
+
+        $this->actingAs($admin, 'backend')
+            ->from("/backend/members/{$member->id}/class-shirt-order")
+            ->put("/backend/members/{$member->id}/class-shirt-order", [
+                'items' => [
+                    ['category' => 'adult', 'size' => 'M', 'quantity' => 1],
+                ],
+                'payment_method' => 'transfer',
+                'payment_account_last_five' => '1234',
+                'payment_status' => 'pending',
+            ])
+            ->assertRedirect("/backend/members/{$member->id}/class-shirt-order")
+            ->assertSessionHasErrors('payment_account_last_five');
     }
 
     public function test_backend_can_export_class_shirt_orders_xlsx(): void
@@ -306,6 +345,9 @@ class AdminAccessTest extends TestCase
                 ['category' => 'adult', 'size' => 'L', 'quantity' => 3],
             ],
             'submitted_at' => now(),
+            'payment_method' => 'transfer',
+            'payment_account_last_five' => '40132',
+            'payment_status' => 'pending',
         ]);
 
         $this->actingAs($admin, 'backend')

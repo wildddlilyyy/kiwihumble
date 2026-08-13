@@ -1,13 +1,13 @@
 @php
     $currentCategory = old('category', $order->category ?? 'child');
-    $currentSize = old('size', $order->size ?? '#6');
+    $currentSize = old('size', \App\Models\ClassShirtOrder::normalizeSize($order->size ?? '#6熱轉印'));
 @endphp
 
 <label class="block">
     <span class="text-sm font-bold text-slate-700">類別</span>
     <select class="mt-2 w-full rounded-lg border-slate-300 focus:border-kiwi-blue focus:ring-kiwi-blue" name="category" required>
         <option value="child" @selected($currentCategory === 'child')>兒童</option>
-        <option value="adult" @selected($currentCategory === 'adult')>大人</option>
+        <option value="adult" @selected($currentCategory === 'adult')>成人</option>
     </select>
 </label>
 
@@ -15,11 +15,11 @@
     <span class="text-sm font-bold text-slate-700">尺寸</span>
     <select class="mt-2 w-full rounded-lg border-slate-300 focus:border-kiwi-blue focus:ring-kiwi-blue" name="size" required>
         <optgroup label="兒童">
-            @foreach (['#6', '#8', '#10'] as $size)
+            @foreach (['#6熱轉印', '#8', '#10'] as $size)
                 <option value="{{ $size }}" @selected($currentSize === $size)>{{ $size }}</option>
             @endforeach
         </optgroup>
-        <optgroup label="大人">
+        <optgroup label="成人">
             @foreach (['XS', 'S', 'M', 'L', 'XL', '2L', '3L', '5L'] as $size)
                 <option value="{{ $size }}" @selected($currentSize === $size)>{{ $size }}</option>
             @endforeach
