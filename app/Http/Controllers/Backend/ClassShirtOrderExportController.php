@@ -22,7 +22,7 @@ class ClassShirtOrderExportController
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Class Shirt Orders');
         $sheet->fromArray([
-            ['NO', 'Name', '類別', '尺寸', '數量', '總金額', '付款方式', '帳號末五碼', '付款狀態', 'Submitted', 'Updated'],
+            ['NO', 'Name', '類別', '尺寸', '數量', '小計', '付款方式', '帳號末五碼', '付款狀態', 'Submitted', 'Updated'],
         ]);
 
         $row = 2;
@@ -36,7 +36,7 @@ class ClassShirtOrderExportController
                     ClassShirtOrder::categoryLabel($item['category'] ?? ''),
                     ClassShirtOrder::normalizeSize($item['size'] ?? ''),
                     $item['quantity'] ?? '',
-                    $order->totalAmount(),
+                    ((int) ($item['quantity'] ?? 0)) * ClassShirtOrder::UNIT_PRICE,
                     $order->payment_method_label,
                     $order->payment_account_last_five,
                     $order->payment_status_label,
