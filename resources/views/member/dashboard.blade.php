@@ -340,19 +340,19 @@
                                 </table>
                             </div>
 
-                            <div class="mt-5 grid items-start gap-4 lg:grid-cols-2">
-                                <div class="rounded-xl border border-[#c9d3dd] bg-transparent p-5">
-                                    <p class="text-sm font-black text-slate-700">匯款資訊</p>
-                                    <div class="mt-3 space-y-1.5 text-base font-bold leading-relaxed text-kiwi-ink">
+                            <div class="mt-5 grid items-stretch gap-4 lg:grid-cols-2">
+                                <div class="min-h-[320px] rounded-xl border border-[#c9d3dd] bg-transparent p-5">
+                                    <p class="pb-3 text-sm font-black text-slate-700">匯款資訊</p>
+                                    <div class="space-y-1.5 text-base font-bold leading-relaxed text-kiwi-ink">
                                         <p><span class="text-slate-500">銀行：</span>中國信託 822</p>
                                         <p><span class="text-slate-500">帳號：</span>647540040132</p>
                                     </div>
                                 </div>
 
-                                <div class="rounded-xl border border-[#c9d3dd] bg-transparent p-5">
+                                <div class="min-h-[320px] rounded-xl border border-[#c9d3dd] bg-transparent p-5">
                                     @if ($classShirtOrder)
                                         <form
-                                            class="space-y-5"
+                                            class="flex h-full flex-col"
                                             method="POST"
                                             action="{{ route('member.class-shirt-order.payment.update') }}"
                                             x-data="{ paymentMethod: @js(old('payment_method', $classShirtOrder->payment_method)) }"
@@ -361,7 +361,7 @@
                                             @method('PUT')
 
                                             <label class="block">
-                                                <span class="mb-2 block text-sm font-bold text-slate-700">付款方式</span>
+                                                <span class="block pb-3 text-sm font-bold text-slate-700">付款方式</span>
                                                 <select class="w-full rounded-lg border-slate-300 bg-white focus:border-kiwi-blue focus:ring-kiwi-blue" name="payment_method" x-model="paymentMethod">
                                                     @foreach (ClassShirtOrder::PAYMENT_METHOD_LABELS as $value => $label)
                                                         <option value="{{ $value }}" @selected(old('payment_method', $classShirtOrder->payment_method) === $value)>{{ $label }}</option>
@@ -369,27 +369,29 @@
                                                 </select>
                                             </label>
 
-                                            <label class="block" x-show="paymentMethod === 'transfer'">
-                                                <span class="mb-2 block text-sm font-bold text-slate-700">帳號末五碼</span>
-                                                <input
-                                                    class="w-full rounded-lg border-slate-300 bg-white focus:border-kiwi-blue focus:ring-kiwi-blue"
-                                                    type="text"
-                                                    name="payment_account_last_five"
-                                                    value="{{ old('payment_account_last_five', $classShirtOrder->payment_account_last_five) }}"
-                                                    inputmode="numeric"
-                                                    maxlength="5"
-                                                    placeholder="匯款請填 5 碼"
-                                                >
-                                            </label>
+                                            <div class="mt-5 min-h-[82px]">
+                                                <label class="block" x-show="paymentMethod === 'transfer'">
+                                                    <span class="block pb-3 text-sm font-bold text-slate-700">帳號末五碼</span>
+                                                    <input
+                                                        class="w-full rounded-lg border-slate-300 bg-white focus:border-kiwi-blue focus:ring-kiwi-blue"
+                                                        type="text"
+                                                        name="payment_account_last_five"
+                                                        value="{{ old('payment_account_last_five', $classShirtOrder->payment_account_last_five) }}"
+                                                        inputmode="numeric"
+                                                        maxlength="5"
+                                                        placeholder="匯款請填 5 碼"
+                                                    >
+                                                </label>
+                                            </div>
 
-                                            <div>
-                                                <p class="mb-2 text-sm font-bold text-slate-700">付款狀態</p>
+                                            <div class="mt-5">
+                                                <p class="pb-3 text-sm font-bold text-slate-700">付款狀態</p>
                                                 <p class="inline-flex rounded-full border px-3 py-1 text-sm font-black text-kiwi-ink" style="{{ $paymentStatusBadgeStyle }}">
                                                     {{ $classShirtOrder->payment_status_label }}
                                                 </p>
                                             </div>
 
-                                            <div class="flex justify-end pt-2">
+                                            <div class="mt-auto flex justify-end pt-6">
                                                 <button class="rounded-lg bg-kiwi-blue px-5 py-3 text-sm font-black text-white hover:bg-kiwi-ink" type="submit">
                                                     更新付款資訊
                                                 </button>
