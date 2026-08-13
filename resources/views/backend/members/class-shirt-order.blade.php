@@ -74,7 +74,7 @@
 
                 <div class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-black/5">
                     <div class="flex flex-col gap-4 border-b border-slate-200 pb-5 xl:flex-row xl:items-start xl:justify-between">
-                        <div class="pt-3">
+                        <div>
                             <p class="text-xs font-black uppercase tracking-wide text-slate-500">Class Shirt Order</p>
                             <div class="mt-2 space-y-1 text-[1.2rem] font-black leading-tight text-kiwi-ink">
                                 <p>{{ $order?->totalQuantity() ?? 0 }} pcs</p>
@@ -83,19 +83,19 @@
                         </div>
 
                         <dl class="grid gap-3 text-sm sm:grid-cols-2 xl:grid-cols-4">
-                            <div class="rounded-lg bg-slate-50 px-4 py-3">
+                            <div class="rounded-lg border border-[#c9d3dd] px-4 py-3" style="background-color: rgb(241 245 249);">
                                 <dt class="font-black text-slate-500">Submitted</dt>
                                 <dd class="mt-1 font-bold text-slate-800">{{ $order?->submitted_at?->timezone(config('app.timezone'))->format('Y-m-d H:i') ?: '-' }}</dd>
                             </div>
-                            <div class="rounded-lg bg-slate-50 px-4 py-3">
+                            <div class="rounded-lg border border-[#c9d3dd] px-4 py-3" style="background-color: rgb(241 245 249);">
                                 <dt class="font-black text-slate-500">Order updated</dt>
                                 <dd class="mt-1 font-bold text-slate-800">{{ $order?->updated_at?->timezone(config('app.timezone'))->format('Y-m-d H:i') ?: '-' }}</dd>
                             </div>
-                            <div class="rounded-lg bg-slate-50 px-4 py-3">
+                            <div class="rounded-lg border border-[#c9d3dd] px-4 py-3" style="background-color: rgb(241 245 249);">
                                 <dt class="font-black text-slate-500">Payment</dt>
                                 <dd class="mt-1 font-bold text-slate-800">{{ $order?->payment_method_label ?? '-' }} {{ $order?->payment_account_last_five ? ' / '.$order->payment_account_last_five : '' }}</dd>
                             </div>
-                            <div class="rounded-lg bg-slate-50 px-4 py-3">
+                            <div class="rounded-lg border border-[#c9d3dd] px-4 py-3" style="background-color: rgb(241 245 249);">
                                 <dt class="font-black text-slate-500">Status</dt>
                                 <dd class="mt-2 inline-flex rounded-full border px-3 py-1 text-xs font-black text-kiwi-ink" style="{{ $paymentStatusBadgeStyle }}">
                                     {{ $order?->payment_status_label ?? ClassShirtOrder::paymentStatusLabel(null) }}

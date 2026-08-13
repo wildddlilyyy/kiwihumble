@@ -278,44 +278,78 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <template x-if="items.length === 0">
-                                            <tr>
-                                                <td class="px-4 py-5 text-center font-bold text-slate-500" colspan="3" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);">
-                                                    尚未新增訂購內容。
-                                                </td>
-                                            </tr>
-                                        </template>
-                                        <template x-for="(item, index) in items" :key="'summary-' + index">
-                                            <tr>
-                                                <td class="px-4 py-3 font-bold text-slate-800" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);" x-text="categoryLabels[item.category]"></td>
-                                                <td class="px-4 py-3 text-slate-700" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);" x-text="item.size"></td>
-                                                <td class="px-4 py-3 text-right text-slate-700" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);" x-text="item.quantity"></td>
-                                            </tr>
-                                        </template>
+                                        @if ($classShirtOrder)
+                                            @forelse ($classShirtOrder->items ?? [] as $item)
+                                                <tr>
+                                                    <td class="px-4 py-3 font-bold text-slate-800" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);">
+                                                        {{ ClassShirtOrder::categoryLabel($item['category'] ?? '') }}
+                                                    </td>
+                                                    <td class="px-4 py-3 text-slate-700" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);">
+                                                        {{ ClassShirtOrder::normalizeSize($item['size'] ?? '') }}
+                                                    </td>
+                                                    <td class="px-4 py-3 text-right text-slate-700" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);">
+                                                        {{ $item['quantity'] ?? 0 }}
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td class="px-4 py-5 text-center font-bold text-slate-500" colspan="3" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);">
+                                                        尚未新增訂購內容。
+                                                    </td>
+                                                </tr>
+                                            @endforelse
+                                        @else
+                                            <template x-if="items.length === 0">
+                                                <tr>
+                                                    <td class="px-4 py-5 text-center font-bold text-slate-500" colspan="3" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);">
+                                                        尚未新增訂購內容。
+                                                    </td>
+                                                </tr>
+                                            </template>
+                                            <template x-for="(item, index) in items" :key="'summary-' + index">
+                                                <tr>
+                                                    <td class="px-4 py-3 font-bold text-slate-800" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);" x-text="categoryLabels[item.category] ?? item.category"></td>
+                                                    <td class="px-4 py-3 text-slate-700" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);" x-text="item.size"></td>
+                                                    <td class="px-4 py-3 text-right text-slate-700" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);" x-text="item.quantity"></td>
+                                                </tr>
+                                            </template>
+                                        @endif
                                     </tbody>
                                     <tfoot class="font-black text-kiwi-ink">
                                         <tr>
                                             <td class="px-4 py-3" colspan="2" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);">總件數</td>
-                                            <td class="px-4 py-3 text-right" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);"><span x-text="totalQuantity()"></span> 件</td>
+                                            <td class="px-4 py-3 text-right" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);">
+                                                @if ($classShirtOrder)
+                                                    {{ $classShirtOrder->totalQuantity() }} 件
+                                                @else
+                                                    <span x-text="totalQuantity()"></span> 件
+                                                @endif
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td class="px-4 py-3" colspan="2" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);">總金額</td>
-                                            <td class="px-4 py-3 text-right" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);" x-text="formatCurrency(totalAmount())"></td>
+                                            <td class="px-4 py-3 text-right" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);">
+                                                @if ($classShirtOrder)
+                                                    NT$ {{ number_format($classShirtOrder->totalAmount()) }}
+                                                @else
+                                                    <span x-text="formatCurrency(totalAmount())"></span>
+                                                @endif
+                                            </td>
                                         </tr>
                                     </tfoot>
                                 </table>
                             </div>
 
-                            <div class="mt-5 grid gap-4 lg:grid-cols-2">
-                                <div class="rounded-xl border border-slate-200 bg-transparent p-4">
-                                    <p class="text-xs font-black uppercase tracking-wide text-slate-500">匯款資訊</p>
-                                    <div class="mt-3 space-y-2 text-base font-bold text-kiwi-ink">
-                                        <p>銀行：中國信託 822</p>
-                                        <p>帳號：647540040132</p>
+                            <div class="mt-5 grid items-start gap-4 lg:grid-cols-2">
+                                <div class="rounded-xl border border-[#c9d3dd] bg-transparent p-5">
+                                    <p class="text-sm font-black text-slate-700">匯款資訊</p>
+                                    <div class="mt-3 space-y-1.5 text-base font-bold leading-relaxed text-kiwi-ink">
+                                        <p><span class="text-slate-500">銀行：</span>中國信託 822</p>
+                                        <p><span class="text-slate-500">帳號：</span>647540040132</p>
                                     </div>
                                 </div>
 
-                                <div class="rounded-xl border border-slate-200 bg-transparent p-4">
+                                <div class="rounded-xl border border-[#c9d3dd] bg-transparent p-5">
                                     @if ($classShirtOrder)
                                         <form
                                             class="space-y-4"
@@ -355,9 +389,11 @@
                                                 </p>
                                             </div>
 
-                                            <button class="w-full rounded-lg bg-kiwi-blue px-5 py-3 text-sm font-black text-white hover:bg-kiwi-ink" type="submit">
-                                                更新付款資訊
-                                            </button>
+                                            <div class="flex justify-end pt-1">
+                                                <button class="rounded-lg bg-kiwi-blue px-5 py-3 text-sm font-black text-white hover:bg-kiwi-ink" type="submit">
+                                                    更新付款資訊
+                                                </button>
+                                            </div>
                                         </form>
                                     @else
                                         <template x-if="submittedAt">
