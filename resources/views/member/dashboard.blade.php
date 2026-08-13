@@ -384,14 +384,14 @@
                                                 </label>
                                             </div>
 
-                                            <div class="mt-5 pb-6">
+                                            <div class="mt-5 pb-8">
                                                 <p class="pb-3 text-sm font-bold text-slate-700">付款狀態</p>
                                                 <p class="inline-flex rounded-full border px-3 py-1 text-sm font-black text-kiwi-ink" style="{{ $paymentStatusBadgeStyle }}">
                                                     {{ $classShirtOrder->payment_status_label }}
                                                 </p>
                                             </div>
 
-                                            <div class="flex flex-1 items-end justify-end pt-8">
+                                            <div class="mt-12 flex justify-end">
                                                 <button class="rounded-lg bg-kiwi-blue px-5 py-3 text-sm font-black text-white hover:bg-kiwi-ink" type="submit">
                                                     更新付款資訊
                                                 </button>
