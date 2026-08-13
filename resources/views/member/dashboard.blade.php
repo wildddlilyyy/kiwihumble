@@ -384,7 +384,7 @@
                                                 </label>
                                             </div>
 
-                                            <div class="mt-5">
+                                            <div class="mt-5 pb-6">
                                                 <p class="pb-3 text-sm font-bold text-slate-700">付款狀態</p>
                                                 <p class="inline-flex rounded-full border px-3 py-1 text-sm font-black text-kiwi-ink" style="{{ $paymentStatusBadgeStyle }}">
                                                     {{ $classShirtOrder->payment_status_label }}
