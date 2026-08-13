@@ -1,6 +1,7 @@
 /.phpunit.cache
 /node_modules
-/public/build
+# Keep the production Vite bundle in version control so Git-based deployments
+# serve the same compiled styles as the local production build.
 /public/hot
 /storage/*.key
 /vendor
