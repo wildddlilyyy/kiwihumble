@@ -280,6 +280,67 @@ class MemberAccessTest extends TestCase
             ->assertDontSee('刪除');
     }
 
+    public function test_member_can_update_submitted_order_payment_information(): void
+    {
+        $member = User::factory()->create(['is_admin' => false]);
+
+        $order = ClassShirtOrder::query()->create([
+            'user_id' => $member->id,
+            'items' => [
+                ['category' => 'adult', 'size' => 'M', 'quantity' => 1],
+            ],
+            'submitted_at' => now(),
+            'payment_method' => 'cash',
+            'payment_status' => 'unpaid',
+        ]);
+
+        $this->actingAs($member, 'member')
+            ->put('/member/class-shirt-order/payment', [
+                'payment_method' => 'transfer',
+                'payment_account_last_five' => '40132',
+                'payment_status' => 'completed',
+            ])
+            ->assertRedirect('/member?tab=class-shirt');
+
+        $order->refresh();
+
+        $this->assertSame([
+            ['category' => 'adult', 'size' => 'M', 'quantity' => 1],
+        ], $order->items);
+        $this->assertSame('transfer', $order->payment_method);
+        $this->assertSame('40132', $order->payment_account_last_five);
+        $this->assertSame('unpaid', $order->payment_status);
+    }
+
+    public function test_member_cash_payment_update_clears_last_five_digits(): void
+    {
+        $member = User::factory()->create(['is_admin' => false]);
+
+        $order = ClassShirtOrder::query()->create([
+            'user_id' => $member->id,
+            'items' => [
+                ['category' => 'adult', 'size' => 'M', 'quantity' => 1],
+            ],
+            'submitted_at' => now(),
+            'payment_method' => 'transfer',
+            'payment_account_last_five' => '40132',
+            'payment_status' => 'pending',
+        ]);
+
+        $this->actingAs($member, 'member')
+            ->put('/member/class-shirt-order/payment', [
+                'payment_method' => 'cash',
+                'payment_account_last_five' => '40132',
+            ])
+            ->assertRedirect('/member?tab=class-shirt');
+
+        $order->refresh();
+
+        $this->assertSame('cash', $order->payment_method);
+        $this->assertNull($order->payment_account_last_five);
+        $this->assertSame('pending', $order->payment_status);
+    }
+
     public function test_backend_and_member_logins_can_exist_in_same_session(): void
     {
         $this->seed();

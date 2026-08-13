@@ -1,5 +1,12 @@
 @php
+    use App\Models\ClassShirtOrder;
+
     $classShirtOrder = $member->classShirtOrder;
+    $paymentStatusBadgeStyle = match ($classShirtOrder?->payment_status ?? ClassShirtOrder::PAYMENT_STATUS_UNPAID) {
+        ClassShirtOrder::PAYMENT_STATUS_PENDING => 'background-color: rgb(254 243 199); border-color: rgb(252 211 77);',
+        ClassShirtOrder::PAYMENT_STATUS_COMPLETED => 'background-color: rgb(220 252 231); border-color: rgb(134 239 172);',
+        default => 'background-color: rgb(241 245 249); border-color: rgb(203 213 225);',
+    };
 @endphp
 
 <x-layouts.app title="Member Home">
@@ -262,66 +269,96 @@
                             @endif
 
                             <div class="mt-5 overflow-hidden rounded-xl border border-slate-200">
-                                <table class="w-full text-left text-sm">
+                                <table class="w-full border-collapse text-left text-sm">
                                     <thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                                         <tr>
-                                            <th class="px-4 py-3">類別</th>
-                                            <th class="px-4 py-3">尺寸</th>
-                                            <th class="px-4 py-3 text-right">數量</th>
+                                            <th class="px-4 py-3" style="background-color: rgb(201 211 221); border-bottom: 1px solid rgba(120, 140, 160, 0.35);">類別</th>
+                                            <th class="px-4 py-3" style="background-color: rgb(201 211 221); border-bottom: 1px solid rgba(120, 140, 160, 0.35);">尺寸</th>
+                                            <th class="px-4 py-3 text-right" style="background-color: rgb(201 211 221); border-bottom: 1px solid rgba(120, 140, 160, 0.35);">數量</th>
                                         </tr>
                                     </thead>
-                                    <tbody class="divide-y divide-slate-200">
+                                    <tbody>
                                         <template x-if="items.length === 0">
                                             <tr>
-                                                <td class="px-4 py-5 text-center font-bold text-slate-500" colspan="3">
+                                                <td class="px-4 py-5 text-center font-bold text-slate-500" colspan="3" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);">
                                                     尚未新增訂購內容。
                                                 </td>
                                             </tr>
                                         </template>
                                         <template x-for="(item, index) in items" :key="'summary-' + index">
                                             <tr>
-                                                <td class="px-4 py-3 font-bold text-slate-800" x-text="categoryLabels[item.category]"></td>
-                                                <td class="px-4 py-3 text-slate-700" x-text="item.size"></td>
-                                                <td class="px-4 py-3 text-right text-slate-700" x-text="item.quantity"></td>
+                                                <td class="px-4 py-3 font-bold text-slate-800" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);" x-text="categoryLabels[item.category]"></td>
+                                                <td class="px-4 py-3 text-slate-700" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);" x-text="item.size"></td>
+                                                <td class="px-4 py-3 text-right text-slate-700" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);" x-text="item.quantity"></td>
                                             </tr>
                                         </template>
                                     </tbody>
-                                    <tfoot class="bg-slate-50 font-black text-kiwi-ink">
+                                    <tfoot class="font-black text-kiwi-ink">
                                         <tr>
-                                            <td class="px-4 py-3" colspan="2">總件數</td>
-                                            <td class="px-4 py-3 text-right"><span x-text="totalQuantity()"></span> 件</td>
+                                            <td class="px-4 py-3" colspan="2" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);">總件數</td>
+                                            <td class="px-4 py-3 text-right" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);"><span x-text="totalQuantity()"></span> 件</td>
                                         </tr>
                                         <tr>
-                                            <td class="px-4 py-3" colspan="2">總金額</td>
-                                            <td class="px-4 py-3 text-right" x-text="formatCurrency(totalAmount())"></td>
+                                            <td class="px-4 py-3" colspan="2" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);">總金額</td>
+                                            <td class="px-4 py-3 text-right" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);" x-text="formatCurrency(totalAmount())"></td>
                                         </tr>
                                     </tfoot>
                                 </table>
                             </div>
 
                             <div class="mt-5 grid gap-4 lg:grid-cols-2">
-                                <div class="rounded-xl bg-sky-50 p-4">
-                                    <p class="text-xs font-black uppercase tracking-wide text-slate-500">付款帳號</p>
-                                    <p class="mt-2 text-lg font-black text-kiwi-ink">中國信託 822</p>
-                                    <p class="mt-1 text-2xl font-black tracking-wide text-kiwi-blue">647540040132</p>
+                                <div class="rounded-xl border border-slate-200 bg-transparent p-4">
+                                    <p class="text-xs font-black uppercase tracking-wide text-slate-500">匯款資訊</p>
+                                    <div class="mt-3 space-y-2 text-base font-bold text-kiwi-ink">
+                                        <p>銀行：中國信託 822</p>
+                                        <p>帳號：647540040132</p>
+                                    </div>
                                 </div>
 
-                                <div class="rounded-xl bg-slate-50 p-4">
+                                <div class="rounded-xl border border-slate-200 bg-transparent p-4">
                                     @if ($classShirtOrder)
-                                        <dl class="space-y-3 text-sm">
+                                        <form
+                                            class="space-y-4"
+                                            method="POST"
+                                            action="{{ route('member.class-shirt-order.payment.update') }}"
+                                            x-data="{ paymentMethod: @js(old('payment_method', $classShirtOrder->payment_method)) }"
+                                        >
+                                            @csrf
+                                            @method('PUT')
+
+                                            <label class="block">
+                                                <span class="text-sm font-bold text-slate-700">付款方式</span>
+                                                <select class="mt-2 w-full rounded-lg border-slate-300 bg-white focus:border-kiwi-blue focus:ring-kiwi-blue" name="payment_method" x-model="paymentMethod">
+                                                    @foreach (ClassShirtOrder::PAYMENT_METHOD_LABELS as $value => $label)
+                                                        <option value="{{ $value }}" @selected(old('payment_method', $classShirtOrder->payment_method) === $value)>{{ $label }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </label>
+
+                                            <label class="block" x-show="paymentMethod === 'transfer'">
+                                                <span class="text-sm font-bold text-slate-700">帳號末五碼</span>
+                                                <input
+                                                    class="mt-2 w-full rounded-lg border-slate-300 bg-white focus:border-kiwi-blue focus:ring-kiwi-blue"
+                                                    type="text"
+                                                    name="payment_account_last_five"
+                                                    value="{{ old('payment_account_last_five', $classShirtOrder->payment_account_last_five) }}"
+                                                    inputmode="numeric"
+                                                    maxlength="5"
+                                                    placeholder="匯款請填 5 碼"
+                                                >
+                                            </label>
+
                                             <div>
-                                                <dt class="font-black text-slate-500">付款方式</dt>
-                                                <dd class="mt-1 font-bold text-slate-800">{{ $classShirtOrder->payment_method_label }}</dd>
+                                                <p class="text-sm font-bold text-slate-700">付款狀態</p>
+                                                <p class="mt-2 inline-flex rounded-full border px-3 py-1 text-sm font-black text-kiwi-ink" style="{{ $paymentStatusBadgeStyle }}">
+                                                    {{ $classShirtOrder->payment_status_label }}
+                                                </p>
                                             </div>
-                                            <div>
-                                                <dt class="font-black text-slate-500">帳號末五碼</dt>
-                                                <dd class="mt-1 font-bold text-slate-800">{{ $classShirtOrder->payment_account_last_five ?: '-' }}</dd>
-                                            </div>
-                                            <div>
-                                                <dt class="font-black text-slate-500">付款狀態</dt>
-                                                <dd class="mt-1 inline-flex rounded-full bg-amber-100 px-3 py-1 font-black text-amber-700">{{ $classShirtOrder->payment_status_label }}</dd>
-                                            </div>
-                                        </dl>
+
+                                            <button class="w-full rounded-lg bg-kiwi-blue px-5 py-3 text-sm font-black text-white hover:bg-kiwi-ink" type="submit">
+                                                更新付款資訊
+                                            </button>
+                                        </form>
                                     @else
                                         <template x-if="submittedAt">
                                             <dl class="space-y-3 text-sm">
@@ -335,7 +372,11 @@
                                                 </div>
                                                 <div>
                                                     <dt class="font-black text-slate-500">付款狀態</dt>
-                                                    <dd class="mt-1 inline-flex rounded-full bg-amber-100 px-3 py-1 font-black text-amber-700" x-text="paymentStatusLabel"></dd>
+                                                    <dd
+                                                        class="mt-1 inline-flex rounded-full border px-3 py-1 font-black text-kiwi-ink"
+                                                        style="background-color: rgb(254 243 199); border-color: rgb(252 211 77);"
+                                                        x-text="paymentStatusLabel"
+                                                    ></dd>
                                                 </div>
                                             </dl>
                                         </template>
@@ -349,7 +390,7 @@
                                                 </select>
                                             </label>
 
-                                            <label class="block">
+                                            <label class="block" x-show="paymentMethod === 'transfer'">
                                                 <span class="text-sm font-bold text-slate-700">帳號末五碼</span>
                                                 <input
                                                     class="mt-2 w-full rounded-lg border-slate-300 focus:border-kiwi-blue focus:ring-kiwi-blue"
@@ -358,7 +399,6 @@
                                                     maxlength="5"
                                                     placeholder="匯款請填 5 碼"
                                                     x-model="paymentAccountLastFive"
-                                                    :disabled="paymentMethod === 'cash'"
                                                 >
                                             </label>
                                         </div>

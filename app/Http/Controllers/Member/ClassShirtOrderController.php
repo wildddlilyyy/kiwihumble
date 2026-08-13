@@ -51,6 +51,24 @@ class ClassShirtOrderController
         ], 403);
     }
 
+    public function updatePayment(Request $request)
+    {
+        $order = $request->user('member')->classShirtOrder;
+
+        abort_if(! $order, 404);
+
+        $payment = $this->validatePayment($request);
+
+        $order->update([
+            'payment_method' => $payment['payment_method'],
+            'payment_account_last_five' => $payment['payment_account_last_five'],
+        ]);
+
+        return redirect()
+            ->route('member.dashboard', ['tab' => 'class-shirt'])
+            ->with('status', '付款資訊已更新。');
+    }
+
     private function validateItems(Request $request): array
     {
         $request->validate([

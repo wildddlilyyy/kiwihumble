@@ -35,6 +35,7 @@ Route::middleware(['auth:member', 'member'])->prefix('member')->name('member.')-
     Route::get('/', MemberDashboardController::class)->name('dashboard');
     Route::put('/', [MemberDashboardController::class, 'update'])->name('profile.update');
     Route::post('/class-shirt-order', [MemberClassShirtOrderController::class, 'store'])->name('class-shirt-order.store');
+    Route::put('/class-shirt-order/payment', [MemberClassShirtOrderController::class, 'updatePayment'])->name('class-shirt-order.payment.update');
     Route::delete('/class-shirt-order', [MemberClassShirtOrderController::class, 'destroy'])->name('class-shirt-order.destroy');
 });
 
