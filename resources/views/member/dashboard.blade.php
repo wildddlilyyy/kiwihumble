@@ -391,7 +391,7 @@
                                                 </p>
                                             </div>
 
-                                            <div class="mt-auto flex justify-end pt-6">
+                                            <div class="flex flex-1 items-end justify-end pt-8">
                                                 <button class="rounded-lg bg-kiwi-blue px-5 py-3 text-sm font-black text-white hover:bg-kiwi-ink" type="submit">
                                                     更新付款資訊
                                                 </button>
