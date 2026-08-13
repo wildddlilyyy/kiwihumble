@@ -347,6 +347,11 @@
                                         <p><span class="text-slate-500">銀行：</span>中國信託 822</p>
                                         <p><span class="text-slate-500">帳號：</span>647540040132</p>
                                     </div>
+                                    <img
+                                        class="mt-4 w-full max-w-[260px] rounded-lg border border-slate-200 bg-white p-2"
+                                        src="{{ asset('assets/payment/transfer-qrcode.jpg') }}"
+                                        alt="中國信託匯款 QR Code，帳號 647540040132"
+                                    >
                                 </div>
 
                                 <div class="rounded-xl border border-[#c9d3dd] bg-transparent p-5">
