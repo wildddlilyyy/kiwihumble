@@ -326,6 +326,32 @@ class AdminAccessTest extends TestCase
             ->assertSessionHasErrors('payment_account_last_five');
     }
 
+    public function test_backend_can_save_unpaid_transfer_order_without_last_five_digits(): void
+    {
+        $this->seed();
+        $admin = User::query()->where('is_admin', true)->firstOrFail();
+        $member = User::factory()->create(['is_admin' => false]);
+
+        $this->actingAs($admin, 'backend')
+            ->put("/backend/members/{$member->id}/class-shirt-order", [
+                'items' => [
+                    ['category' => 'child', 'size' => '#8', 'quantity' => 1],
+                ],
+                'payment_method' => 'transfer',
+                'payment_account_last_five' => '',
+                'payment_status' => 'unpaid',
+            ])
+            ->assertRedirect("/backend/members/{$member->id}/class-shirt-order")
+            ->assertSessionDoesntHaveErrors();
+
+        $this->assertDatabaseHas('class_shirt_orders', [
+            'user_id' => $member->id,
+            'payment_method' => 'transfer',
+            'payment_account_last_five' => null,
+            'payment_status' => 'unpaid',
+        ]);
+    }
+
     public function test_backend_can_export_class_shirt_orders_xlsx(): void
     {
         if (! class_exists(\ZipArchive::class)) {

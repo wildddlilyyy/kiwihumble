@@ -198,12 +198,15 @@ class MemberController
             'payment_method' => ['required', Rule::in(array_keys(ClassShirtOrder::PAYMENT_METHOD_LABELS))],
             'payment_account_last_five' => [
                 'nullable',
-                'required_if:payment_method,'.ClassShirtOrder::PAYMENT_METHOD_TRANSFER,
+                Rule::requiredIf(fn (): bool =>
+                    $request->input('payment_method') === ClassShirtOrder::PAYMENT_METHOD_TRANSFER
+                    && $request->input('payment_status') !== ClassShirtOrder::PAYMENT_STATUS_UNPAID
+                ),
                 'digits:5',
             ],
             'payment_status' => ['required', Rule::in(array_keys(ClassShirtOrder::PAYMENT_STATUS_LABELS))],
         ], [
-            'payment_account_last_five.required_if' => 'Transfer orders require the account last five digits.',
+            'payment_account_last_five.required' => 'Transfer orders marked as pending or completed require the account last five digits.',
             'payment_account_last_five.digits' => 'Account last five digits must be exactly 5 numbers.',
         ]);
 
