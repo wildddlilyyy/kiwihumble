@@ -341,7 +341,7 @@
                             </div>
 
                             <div class="mt-5 grid items-stretch gap-4 lg:grid-cols-2">
-                                <div class="min-h-[320px] rounded-xl border border-[#c9d3dd] bg-transparent p-5">
+                                <div class="rounded-xl border border-[#c9d3dd] bg-transparent p-5">
                                     <p class="pb-3 text-sm font-black text-slate-700">匯款資訊</p>
                                     <div class="space-y-1.5 text-base font-bold leading-relaxed text-kiwi-ink">
                                         <p><span class="text-slate-500">銀行：</span>中國信託 822</p>
@@ -349,7 +349,7 @@
                                     </div>
                                 </div>
 
-                                <div class="min-h-[320px] rounded-xl border border-[#c9d3dd] bg-transparent p-5">
+                                <div class="rounded-xl border border-[#c9d3dd] bg-transparent p-5">
                                     @if ($classShirtOrder)
                                         <form
                                             class="flex h-full flex-col"
@@ -369,7 +369,7 @@
                                                 </select>
                                             </label>
 
-                                            <div class="mt-5 min-h-[82px]">
+                                            <div class="mt-5" x-show="paymentMethod === 'transfer'">
                                                 <label class="block" x-show="paymentMethod === 'transfer'">
                                                     <span class="block pb-3 text-sm font-bold text-slate-700">帳號末五碼</span>
                                                     <input
@@ -384,14 +384,14 @@
                                                 </label>
                                             </div>
 
-                                            <div class="mt-5 pb-8">
+                                            <div class="mt-5">
                                                 <p class="pb-3 text-sm font-bold text-slate-700">付款狀態</p>
                                                 <p class="inline-flex rounded-full border px-3 py-1 text-sm font-black text-kiwi-ink" style="{{ $paymentStatusBadgeStyle }}">
                                                     {{ $classShirtOrder->payment_status_label }}
                                                 </p>
                                             </div>
 
-                                            <div class="mt-12 flex justify-end">
+                                            <div class="mt-8 flex justify-end">
                                                 <button class="rounded-lg bg-kiwi-blue px-5 py-3 text-sm font-black text-white hover:bg-kiwi-ink" type="submit">
                                                     更新付款資訊
                                                 </button>
