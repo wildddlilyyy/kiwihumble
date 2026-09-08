@@ -17,14 +17,14 @@ class TripRegistrationController
             'adults_count' => ['required', 'integer', 'min:0', 'max:20'],
             'children_count' => ['required', 'integer', 'min:0', 'max:20'],
             'child_ages' => ['nullable', 'array', 'max:20'],
-            'child_ages.*' => ['required', 'integer', 'min:0', 'max:18'],
+            'child_ages.*' => ['required', 'integer', 'min:0', 'max:17'],
             'room_count' => ['required', 'integer', 'min:0', 'max:10'],
             'room_types' => ['nullable', 'array', 'max:10'],
             'room_types.*' => ['required', Rule::in(array_keys(TripRegistration::ROOM_TYPES))],
         ], [
             'child_ages.*.required' => '請填寫每位小孩的年齡。',
             'child_ages.*.integer' => '小孩年齡請填寫整數。',
-            'child_ages.*.between' => '小孩年齡需介於 0 到 18 歲。',
+            'child_ages.*.between' => '小孩年齡需介於 0 到 17 歲。',
         ]);
 
         $validator->after(function ($validator) use ($request): void {

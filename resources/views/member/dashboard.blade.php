@@ -164,51 +164,51 @@
 
                             <section class="rounded-xl border border-slate-200 p-5">
                                 <h3 class="text-lg font-black text-kiwi-ink">一、人數調查</h3>
-                                <div class="mt-4 grid gap-5 sm:grid-cols-2">
-                                    <label class="block">
-                                        <span class="text-sm font-bold text-slate-700">大人幾位</span>
-                                        <input
-                                            class="mt-2 w-full rounded-lg border-slate-300 focus:border-kiwi-blue focus:ring-kiwi-blue"
-                                            type="number"
-                                            name="adults_count"
-                                            min="0"
-                                            max="20"
-                                            required
-                                            x-model.number="adultsCount"
-                                        >
-                                    </label>
+                                <div class="mt-4 divide-y divide-slate-200 border-y border-slate-200">
+                                    <div class="flex items-center justify-between gap-4 py-4">
+                                        <span class="text-base font-black text-kiwi-ink">大人</span>
+                                        <div class="flex items-center gap-4">
+                                            <button class="grid size-8 place-items-center rounded-full border border-slate-300 text-lg leading-none text-slate-500 transition hover:border-kiwi-blue hover:text-kiwi-blue disabled:cursor-not-allowed disabled:opacity-40" type="button" aria-label="減少大人人數" @click="adjustCount('adultsCount', -1, 20)" :disabled="adultsCount <= 0">−</button>
+                                            <span class="w-5 text-center text-xl font-black text-kiwi-ink" x-text="adultsCount"></span>
+                                            <button class="grid size-8 place-items-center rounded-full border border-slate-300 text-lg leading-none text-kiwi-blue transition hover:border-kiwi-blue hover:bg-sky-50 disabled:cursor-not-allowed disabled:opacity-40" type="button" aria-label="增加大人人數" @click="adjustCount('adultsCount', 1, 20)" :disabled="adultsCount >= 20">+</button>
+                                        </div>
+                                        <input type="hidden" name="adults_count" :value="adultsCount">
+                                    </div>
 
-                                    <label class="block">
-                                        <span class="text-sm font-bold text-slate-700">小孩幾位</span>
-                                        <input
-                                            class="mt-2 w-full rounded-lg border-slate-300 focus:border-kiwi-blue focus:ring-kiwi-blue"
-                                            type="number"
-                                            name="children_count"
-                                            min="0"
-                                            max="20"
-                                            required
-                                            x-model.number="childrenCount"
-                                            @change="syncChildAges()"
-                                        >
-                                    </label>
+                                    <div class="flex items-center justify-between gap-4 py-4">
+                                        <div>
+                                            <span class="block text-base font-black text-kiwi-ink">兒童</span>
+                                            <span class="mt-1 block text-sm font-bold text-slate-500">0-17歲</span>
+                                        </div>
+                                        <div class="flex items-center gap-4">
+                                            <button class="grid size-8 place-items-center rounded-full border border-slate-300 text-lg leading-none text-slate-500 transition hover:border-kiwi-blue hover:text-kiwi-blue disabled:cursor-not-allowed disabled:opacity-40" type="button" aria-label="減少兒童人數" @click="adjustCount('childrenCount', -1, 20)" :disabled="childrenCount <= 0">−</button>
+                                            <span class="w-5 text-center text-xl font-black text-kiwi-ink" x-text="childrenCount"></span>
+                                            <button class="grid size-8 place-items-center rounded-full border border-slate-300 text-lg leading-none text-kiwi-blue transition hover:border-kiwi-blue hover:bg-sky-50 disabled:cursor-not-allowed disabled:opacity-40" type="button" aria-label="增加兒童人數" @click="adjustCount('childrenCount', 1, 20)" :disabled="childrenCount >= 20">+</button>
+                                        </div>
+                                        <input type="hidden" name="children_count" :value="childrenCount">
+                                    </div>
                                 </div>
 
                                 <div class="mt-5" x-show="Number(childrenCount) > 0">
-                                    <p class="text-sm font-bold text-slate-700">小孩年齡（歲）</p>
+                                    <div class="border-t border-slate-200 pt-4">
+                                        <p class="text-sm font-bold leading-6 text-slate-700">請務必輸入兒童的正確年齡以獲得準確房價。</p>
+                                        <p class="mt-1 text-sm font-bold text-slate-500">小孩年齡範圍：0-17歲</p>
+                                    </div>
                                     <div class="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                                         <template x-for="(age, index) in childAges" :key="`child-age-${index}`">
                                             <label class="block">
-                                                <span class="text-sm font-bold text-slate-500" x-text="`第 ${index + 1} 位小孩`"></span>
-                                                <input
-                                                    class="mt-2 w-full rounded-lg border-slate-300 focus:border-kiwi-blue focus:ring-kiwi-blue"
-                                                    type="number"
+                                                <span class="text-sm font-bold text-slate-500" x-text="`第 ${index + 1} 位兒童年齡`"></span>
+                                                <select
+                                                    class="mt-2 w-full rounded-lg border-slate-300 bg-white focus:border-kiwi-blue focus:ring-kiwi-blue"
                                                     name="child_ages[]"
-                                                    min="0"
-                                                    max="18"
-                                                    placeholder="Y"
                                                     required
                                                     x-model="childAges[index]"
                                                 >
+                                                    <option value="" disabled>請選擇年齡</option>
+                                                    @for ($age = 0; $age <= 17; $age++)
+                                                        <option value="{{ $age }}">{{ $age }}歲</option>
+                                                    @endfor
+                                                </select>
                                             </label>
                                         </template>
                                     </div>
@@ -217,36 +217,34 @@
 
                             <section class="rounded-xl border border-slate-200 p-5">
                                 <h3 class="text-lg font-black text-kiwi-ink">二、房型調查</h3>
-                                <div class="mt-4 grid gap-5 sm:grid-cols-2">
-                                    <label class="block">
-                                        <span class="text-sm font-bold text-slate-700">需要幾間房</span>
-                                        <input
-                                            class="mt-2 w-full rounded-lg border-slate-300 focus:border-kiwi-blue focus:ring-kiwi-blue"
-                                            type="number"
-                                            name="room_count"
-                                            min="0"
-                                            max="10"
-                                            required
-                                            x-model.number="roomCount"
-                                            @change="syncRoomTypes()"
-                                        >
-                                    </label>
+                                <div class="mt-4">
+                                    <div class="flex items-center justify-between gap-4 border-y border-slate-200 py-4">
+                                        <span class="text-base font-black text-kiwi-ink">客房</span>
+                                        <div class="flex items-center gap-4">
+                                            <button class="grid size-8 place-items-center rounded-full border border-slate-300 text-lg leading-none text-slate-500 transition hover:border-kiwi-blue hover:text-kiwi-blue disabled:cursor-not-allowed disabled:opacity-40" type="button" aria-label="減少房間數量" @click="adjustCount('roomCount', -1, 10)" :disabled="roomCount <= 0">−</button>
+                                            <span class="w-5 text-center text-xl font-black text-kiwi-ink" x-text="roomCount"></span>
+                                            <button class="grid size-8 place-items-center rounded-full border border-slate-300 text-lg leading-none text-kiwi-blue transition hover:border-kiwi-blue hover:bg-sky-50 disabled:cursor-not-allowed disabled:opacity-40" type="button" aria-label="增加房間數量" @click="adjustCount('roomCount', 1, 10)" :disabled="roomCount >= 10">+</button>
+                                        </div>
+                                        <input type="hidden" name="room_count" :value="roomCount">
+                                    </div>
 
-                                    <template x-for="(roomType, index) in roomTypes" :key="`room-${index}`">
-                                        <label class="block rounded-lg bg-slate-50 p-4 sm:first-of-type:row-start-1">
-                                            <span class="text-sm font-bold text-slate-700" x-text="`第 ${index + 1} 間房`"></span>
-                                            <select
-                                                class="mt-2 w-full rounded-lg border-slate-300 bg-white focus:border-kiwi-blue focus:ring-kiwi-blue"
-                                                name="room_types[]"
-                                                required
-                                                x-model="roomTypes[index]"
-                                            >
-                                                <option value="double">雙人房（一大床）</option>
-                                                <option value="quad">四人房（兩大床）</option>
-                                                <option value="six">六人房（三大床）</option>
-                                            </select>
-                                        </label>
-                                    </template>
+                                    <div class="mt-4 space-y-4">
+                                        <template x-for="(roomType, index) in roomTypes" :key="`room-${index}`">
+                                            <label class="block border-b border-slate-200 py-4">
+                                                <span class="text-sm font-bold text-slate-700" x-text="`第 ${index + 1} 間房`"></span>
+                                                <select
+                                                    class="mt-2 w-full rounded-lg border-slate-300 bg-white focus:border-kiwi-blue focus:ring-kiwi-blue"
+                                                    name="room_types[]"
+                                                    required
+                                                    x-model="roomTypes[index]"
+                                                >
+                                                    <option value="double">雙人房（一大床）</option>
+                                                    <option value="quad">四人房（兩大床）</option>
+                                                    <option value="six">六人房（三大床）</option>
+                                                </select>
+                                            </label>
+                                        </template>
+                                    </div>
                                 </div>
                             </section>
 

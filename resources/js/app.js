@@ -225,7 +225,7 @@ window.tripRegistrationForm = function tripRegistrationForm(config) {
   return {
     adultsCount: Number(config.adultsCount ?? 0),
     childrenCount: Number(config.childrenCount ?? 0),
-    childAges: (config.childAges ?? []).map((age) => Number(age)),
+    childAges: (config.childAges ?? []).map((age) => String(age)),
     roomCount: Number(config.roomCount ?? 0),
     roomTypes: [...(config.roomTypes ?? [])],
     submittedAt: config.submittedAt ?? "",
@@ -244,6 +244,17 @@ window.tripRegistrationForm = function tripRegistrationForm(config) {
     syncRoomTypes() {
       const count = Math.max(0, Number(this.roomCount || 0));
       this.roomTypes = Array.from({ length: count }, (_, index) => this.roomTypes[index] ?? "double");
+    },
+    adjustCount(field, delta, max) {
+      this[field] = Math.min(max, Math.max(0, Number(this[field] || 0) + delta));
+
+      if (field === "childrenCount") {
+        this.syncChildAges();
+      }
+
+      if (field === "roomCount") {
+        this.syncRoomTypes();
+      }
     },
     async submit() {
       this.status = "";
