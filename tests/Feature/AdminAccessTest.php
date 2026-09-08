@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\ClassShirtOrder;
+use App\Models\TripRegistration;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -43,6 +44,41 @@ class AdminAccessTest extends TestCase
             ->get('/backend')
             ->assertOk()
             ->assertSee('KIWI HUMBLE Dashboard');
+    }
+
+    public function test_admin_dashboard_can_switch_between_trip_and_shirt_lists(): void
+    {
+        $this->seed();
+        $admin = User::query()->where('is_admin', true)->firstOrFail();
+        $member = User::factory()->create(['name' => 'Lily Family', 'is_admin' => false]);
+
+        TripRegistration::query()->create([
+            'user_id' => $member->id,
+            'adults_count' => 2,
+            'children_count' => 1,
+            'child_ages' => [6],
+            'room_count' => 1,
+            'room_types' => ['quad'],
+            'submitted_at' => now(),
+        ]);
+
+        ClassShirtOrder::query()->create([
+            'user_id' => $member->id,
+            'items' => [['category' => 'adult', 'size' => 'M', 'quantity' => 1]],
+            'submitted_at' => now(),
+            'payment_method' => 'cash',
+            'payment_status' => 'pending',
+        ]);
+
+        $this->actingAs($admin, 'backend')
+            ->get('/backend')
+            ->assertOk()
+            ->assertSee('畢旅')
+            ->assertSee('班服登記')
+            ->assertSee('Lily Family')
+            ->assertSee('6Y')
+            ->assertSee('四人房（兩大床）')
+            ->assertSee('付款待確認');
     }
 
     public function test_admin_can_update_site_settings(): void

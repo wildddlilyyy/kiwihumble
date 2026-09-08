@@ -163,7 +163,7 @@
                             @csrf
 
                             <section class="rounded-xl border border-slate-200 p-5">
-                                <h3 class="text-lg font-black text-kiwi-ink">第一項：人數調查</h3>
+                                <h3 class="text-lg font-black text-kiwi-ink">一、人數調查</h3>
                                 <div class="mt-4 grid gap-5 sm:grid-cols-2">
                                     <label class="block">
                                         <span class="text-sm font-bold text-slate-700">大人幾位</span>
@@ -205,6 +205,7 @@
                                                     name="child_ages[]"
                                                     min="0"
                                                     max="18"
+                                                    placeholder="Y"
                                                     required
                                                     x-model="childAges[index]"
                                                 >
@@ -215,24 +216,24 @@
                             </section>
 
                             <section class="rounded-xl border border-slate-200 p-5">
-                                <h3 class="text-lg font-black text-kiwi-ink">第二項：房型調查</h3>
-                                <label class="mt-4 block max-w-xs">
-                                    <span class="text-sm font-bold text-slate-700">需要幾間房</span>
-                                    <input
-                                        class="mt-2 w-full rounded-lg border-slate-300 focus:border-kiwi-blue focus:ring-kiwi-blue"
-                                        type="number"
-                                        name="room_count"
-                                        min="0"
-                                        max="10"
-                                        required
-                                        x-model.number="roomCount"
-                                        @change="syncRoomTypes()"
-                                    >
-                                </label>
+                                <h3 class="text-lg font-black text-kiwi-ink">二、房型調查</h3>
+                                <div class="mt-4 grid gap-5 sm:grid-cols-2">
+                                    <label class="block">
+                                        <span class="text-sm font-bold text-slate-700">需要幾間房</span>
+                                        <input
+                                            class="mt-2 w-full rounded-lg border-slate-300 focus:border-kiwi-blue focus:ring-kiwi-blue"
+                                            type="number"
+                                            name="room_count"
+                                            min="0"
+                                            max="10"
+                                            required
+                                            x-model.number="roomCount"
+                                            @change="syncRoomTypes()"
+                                        >
+                                    </label>
 
-                                <div class="mt-5 grid gap-4 md:grid-cols-2">
                                     <template x-for="(roomType, index) in roomTypes" :key="`room-${index}`">
-                                        <label class="block rounded-lg bg-slate-50 p-4">
+                                        <label class="block rounded-lg bg-slate-50 p-4 sm:first-of-type:row-start-1">
                                             <span class="text-sm font-bold text-slate-700" x-text="`第 ${index + 1} 間房`"></span>
                                             <select
                                                 class="mt-2 w-full rounded-lg border-slate-300 bg-white focus:border-kiwi-blue focus:ring-kiwi-blue"

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Backend;
 
+use App\Models\User;
 use App\Models\SiteSetting;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -13,6 +14,11 @@ class DashboardController
     {
         return view('backend.dashboard', [
             'settings' => SiteSetting::query()->orderBy('key')->get(),
+            'members' => User::query()
+                ->where('is_admin', false)
+                ->with(['classShirtOrder', 'tripRegistration'])
+                ->orderBy('name')
+                ->get(),
         ]);
     }
 
