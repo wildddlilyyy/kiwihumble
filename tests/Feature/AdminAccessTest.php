@@ -71,13 +71,18 @@ class AdminAccessTest extends TestCase
         ]);
 
         $this->actingAs($admin, 'backend')
-            ->get('/backend')
+            ->get('/backend/trip')
             ->assertOk()
             ->assertSee('畢旅')
-            ->assertSee('班服登記')
             ->assertSee('Lily Family')
             ->assertSee('6Y')
-            ->assertSee('四人房（兩大床）')
+            ->assertSee('四人房（兩大床）');
+
+        $this->actingAs($admin, 'backend')
+            ->get('/backend/shirts')
+            ->assertOk()
+            ->assertSee('班服登記')
+            ->assertSee('Lily Family')
             ->assertSee('付款待確認');
     }
 
@@ -92,7 +97,7 @@ class AdminAccessTest extends TestCase
                 'trip_date' => '2027-06-01',
                 'timezone' => 'Asia/Taipei',
             ])
-            ->assertRedirect('/backend');
+            ->assertRedirect('/backend/members');
 
         $this->assertDatabaseHas('site_settings', [
             'key' => 'trip_title',

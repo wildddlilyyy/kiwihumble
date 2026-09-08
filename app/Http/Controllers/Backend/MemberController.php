@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend;
 
 use App\Models\ClassShirtOrder;
+use App\Models\SiteSetting;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -16,6 +17,7 @@ class MemberController
     public function index(): View
     {
         return view('backend.members.index', [
+            'settings' => SiteSetting::query()->orderBy('key')->get(),
             'members' => User::query()
                 ->where('is_admin', false)
                 ->with('classShirtOrder')

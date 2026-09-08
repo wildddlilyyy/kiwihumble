@@ -12,13 +12,20 @@ class DashboardController
 {
     public function __invoke(): View
     {
-        return view('backend.dashboard', [
-            'settings' => SiteSetting::query()->orderBy('key')->get(),
-            'members' => User::query()
-                ->where('is_admin', false)
-                ->with(['classShirtOrder', 'tripRegistration'])
-                ->orderBy('name')
-                ->get(),
+        return view('backend.dashboard');
+    }
+
+    public function trip(): View
+    {
+        return view('backend.trip', [
+            'members' => $this->members(),
+        ]);
+    }
+
+    public function shirts(): View
+    {
+        return view('backend.shirts', [
+            'members' => $this->members(),
         ]);
     }
 
@@ -44,7 +51,16 @@ class DashboardController
         }
 
         return redirect()
-            ->route('backend.dashboard')
+            ->route('backend.members.index')
             ->with('status', 'Site settings updated.');
+    }
+
+    private function members()
+    {
+        return User::query()
+            ->where('is_admin', false)
+            ->with(['classShirtOrder', 'tripRegistration'])
+            ->orderBy('name')
+            ->get();
     }
 }

@@ -43,6 +43,8 @@ Route::middleware(['auth:member', 'member'])->prefix('member')->name('member.')-
 
 Route::middleware(['auth:backend', 'admin'])->prefix('backend')->name('backend.')->group(function () {
     Route::get('/', BackendDashboardController::class)->name('dashboard');
+    Route::get('/shirts', [BackendDashboardController::class, 'shirts'])->name('shirts');
+    Route::get('/trip', [BackendDashboardController::class, 'trip'])->name('trip');
     Route::post('/settings', [BackendDashboardController::class, 'update'])->name('settings.update');
     Route::get('/class-shirt-orders/export', BackendClassShirtOrderExportController::class)->name('class-shirt-orders.export');
     Route::get('/members', [BackendMemberController::class, 'index'])->name('members.index');
