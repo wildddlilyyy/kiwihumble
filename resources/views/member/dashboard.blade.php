@@ -2,6 +2,7 @@
     use App\Models\ClassShirtOrder;
 
     $classShirtOrder = $member->classShirtOrder;
+    $tripRegistration = $member->tripRegistration;
     $paymentStatusBadgeStyle = match ($classShirtOrder?->payment_status ?? ClassShirtOrder::PAYMENT_STATUS_UNPAID) {
         ClassShirtOrder::PAYMENT_STATUS_PENDING => 'background-color: rgb(254 243 199); border-color: rgb(252 211 77);',
         ClassShirtOrder::PAYMENT_STATUS_COMPLETED => 'background-color: rgb(220 252 231); border-color: rgb(134 239 172);',
@@ -19,7 +20,7 @@
 
                 <div
                     class="mt-8 rounded-xl bg-white/95 p-6 text-kiwi-ink shadow-xl shadow-black/10 ring-1 ring-white/40"
-                    x-data="{ tab: new URLSearchParams(window.location.search).get('tab') === 'class-shirt' ? 'class-shirt' : 'profile' }"
+                    x-data="{ tab: ['class-shirt', 'trip'].includes(new URLSearchParams(window.location.search).get('tab')) ? new URLSearchParams(window.location.search).get('tab') : 'profile' }"
                 >
                     <p class="font-hand text-2xl text-kiwi-gold">Welcome back</p>
                     <h1 class="font-display text-4xl font-extrabold">{{ $member->name }}</h1>
@@ -40,6 +41,14 @@
                             @click="tab = 'class-shirt'"
                         >
                             班服訂購
+                        </button>
+                        <button
+                            class="rounded-full px-4 py-2 text-sm font-black transition"
+                            :class="tab === 'trip' ? 'bg-kiwi-blue text-white' : 'bg-slate-100 text-kiwi-blue hover:bg-slate-200'"
+                            type="button"
+                            @click="tab = 'trip'"
+                        >
+                            畢旅人數及房間登記
                         </button>
                     </div>
 
@@ -124,6 +133,134 @@
                             <button class="rounded-lg bg-kiwi-blue px-4 py-2 text-sm font-black text-white hover:bg-kiwi-ink" type="submit">
                                 Save Profile
                             </button>
+                        </form>
+                    </div>
+
+                    <div class="mt-6 space-y-6" x-show="tab === 'trip'">
+                        <div class="rounded-xl bg-sky-50 p-5 ring-1 ring-sky-100">
+                            <h2 class="text-xl font-black text-kiwi-ink">畢旅人數及房間登記</h2>
+                            <p class="mt-2 text-sm font-bold leading-6 text-slate-600">
+                                先進行人數及房型調查，之後再請旅行社直接統一處理。
+                            </p>
+                            <p class="mt-2 font-black text-kiwi-blue">入住時間：2027/5/29 ~ 5/30（六日）</p>
+                        </div>
+
+                        <form
+                            class="space-y-6"
+                            method="POST"
+                            action="{{ route('member.trip-registration.store') }}"
+                            x-data="tripRegistrationForm({
+                                adultsCount: @js($tripRegistration?->adults_count ?? 0),
+                                childrenCount: @js($tripRegistration?->children_count ?? 0),
+                                childAges: @js($tripRegistration?->child_ages ?? []),
+                                roomCount: @js($tripRegistration?->room_count ?? 0),
+                                roomTypes: @js($tripRegistration?->room_types ?? []),
+                                submittedAt: @js($tripRegistration?->submitted_at?->timezone(config('app.timezone'))->format('Y-m-d H:i')),
+                            })"
+                            x-ref="form"
+                            @submit.prevent="submit()"
+                        >
+                            @csrf
+
+                            <section class="rounded-xl border border-slate-200 p-5">
+                                <h3 class="text-lg font-black text-kiwi-ink">第一項：人數調查</h3>
+                                <div class="mt-4 grid gap-5 sm:grid-cols-2">
+                                    <label class="block">
+                                        <span class="text-sm font-bold text-slate-700">大人幾位</span>
+                                        <input
+                                            class="mt-2 w-full rounded-lg border-slate-300 focus:border-kiwi-blue focus:ring-kiwi-blue"
+                                            type="number"
+                                            name="adults_count"
+                                            min="0"
+                                            max="20"
+                                            required
+                                            x-model.number="adultsCount"
+                                        >
+                                    </label>
+
+                                    <label class="block">
+                                        <span class="text-sm font-bold text-slate-700">小孩幾位</span>
+                                        <input
+                                            class="mt-2 w-full rounded-lg border-slate-300 focus:border-kiwi-blue focus:ring-kiwi-blue"
+                                            type="number"
+                                            name="children_count"
+                                            min="0"
+                                            max="20"
+                                            required
+                                            x-model.number="childrenCount"
+                                            @change="syncChildAges()"
+                                        >
+                                    </label>
+                                </div>
+
+                                <div class="mt-5" x-show="Number(childrenCount) > 0">
+                                    <p class="text-sm font-bold text-slate-700">小孩年齡（歲）</p>
+                                    <div class="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                                        <template x-for="(age, index) in childAges" :key="`child-age-${index}`">
+                                            <label class="block">
+                                                <span class="text-sm font-bold text-slate-500" x-text="`第 ${index + 1} 位小孩`"></span>
+                                                <input
+                                                    class="mt-2 w-full rounded-lg border-slate-300 focus:border-kiwi-blue focus:ring-kiwi-blue"
+                                                    type="number"
+                                                    name="child_ages[]"
+                                                    min="0"
+                                                    max="18"
+                                                    required
+                                                    x-model="childAges[index]"
+                                                >
+                                            </label>
+                                        </template>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section class="rounded-xl border border-slate-200 p-5">
+                                <h3 class="text-lg font-black text-kiwi-ink">第二項：房型調查</h3>
+                                <label class="mt-4 block max-w-xs">
+                                    <span class="text-sm font-bold text-slate-700">需要幾間房</span>
+                                    <input
+                                        class="mt-2 w-full rounded-lg border-slate-300 focus:border-kiwi-blue focus:ring-kiwi-blue"
+                                        type="number"
+                                        name="room_count"
+                                        min="0"
+                                        max="10"
+                                        required
+                                        x-model.number="roomCount"
+                                        @change="syncRoomTypes()"
+                                    >
+                                </label>
+
+                                <div class="mt-5 grid gap-4 md:grid-cols-2">
+                                    <template x-for="(roomType, index) in roomTypes" :key="`room-${index}`">
+                                        <label class="block rounded-lg bg-slate-50 p-4">
+                                            <span class="text-sm font-bold text-slate-700" x-text="`第 ${index + 1} 間房`"></span>
+                                            <select
+                                                class="mt-2 w-full rounded-lg border-slate-300 bg-white focus:border-kiwi-blue focus:ring-kiwi-blue"
+                                                name="room_types[]"
+                                                required
+                                                x-model="roomTypes[index]"
+                                            >
+                                                <option value="double">雙人房（一大床）</option>
+                                                <option value="quad">四人房（兩大床）</option>
+                                                <option value="six">六人房（三大床）</option>
+                                            </select>
+                                        </label>
+                                    </template>
+                                </div>
+                            </section>
+
+                            <div class="rounded-lg bg-slate-50 p-4 text-sm font-bold text-slate-600" x-show="submittedAt">
+                                上次送出時間：<span x-text="submittedAt"></span>
+                            </div>
+                            <div class="rounded-lg bg-emerald-50 p-3 text-sm font-bold text-emerald-700" x-show="status" x-text="status"></div>
+                            <div class="rounded-lg bg-red-50 p-3 text-sm font-bold text-red-700" x-show="error" x-text="error"></div>
+
+                            <div class="flex justify-end">
+                                <button class="rounded-lg bg-kiwi-blue px-5 py-3 text-sm font-black text-white hover:bg-kiwi-ink disabled:cursor-not-allowed disabled:opacity-60" type="submit" :disabled="isSaving">
+                                    <span x-show="! isSaving">送出畢旅登記</span>
+                                    <span x-show="isSaving">送出中...</span>
+                                </button>
+                            </div>
                         </form>
                     </div>
 

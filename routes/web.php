@@ -7,6 +7,7 @@ use App\Http\Controllers\Backend\MemberController as BackendMemberController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Member\ClassShirtOrderController as MemberClassShirtOrderController;
 use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
+use App\Http\Controllers\Member\TripRegistrationController as MemberTripRegistrationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
@@ -37,6 +38,7 @@ Route::middleware(['auth:member', 'member'])->prefix('member')->name('member.')-
     Route::post('/class-shirt-order', [MemberClassShirtOrderController::class, 'store'])->name('class-shirt-order.store');
     Route::put('/class-shirt-order/payment', [MemberClassShirtOrderController::class, 'updatePayment'])->name('class-shirt-order.payment.update');
     Route::delete('/class-shirt-order', [MemberClassShirtOrderController::class, 'destroy'])->name('class-shirt-order.destroy');
+    Route::post('/trip-registration', [MemberTripRegistrationController::class, 'store'])->name('trip-registration.store');
 });
 
 Route::middleware(['auth:backend', 'admin'])->prefix('backend')->name('backend.')->group(function () {

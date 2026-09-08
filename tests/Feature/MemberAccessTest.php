@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\ClassShirtOrder;
+use App\Models\TripRegistration;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
@@ -72,6 +73,7 @@ class MemberAccessTest extends TestCase
             ->assertOk()
             ->assertSee('家長資料')
             ->assertSee('班服訂購')
+            ->assertSee('畢旅人數及房間登記')
             ->assertSee('班服尺寸 - 兒童')
             ->assertSee('班服尺寸 - 成人')
             ->assertSee('Humble 班服尺寸表');
@@ -120,6 +122,68 @@ class MemberAccessTest extends TestCase
             'dad_name' => 'Dad New',
             'dad_phone' => '0922333444',
         ]);
+    }
+
+    public function test_member_can_submit_and_update_trip_registration(): void
+    {
+        $member = User::factory()->create(['is_admin' => false]);
+
+        $this->actingAs($member, 'member')
+            ->postJson('/member/trip-registration', [
+                'adults_count' => 2,
+                'children_count' => 2,
+                'child_ages' => [5, 8],
+                'room_count' => 2,
+                'room_types' => ['double', 'quad'],
+            ])
+            ->assertOk()
+            ->assertJsonPath('status', '畢旅人數及房間登記已送出。');
+
+        $registration = TripRegistration::query()->where('user_id', $member->id)->firstOrFail();
+
+        $this->assertSame(1, TripRegistration::query()->where('user_id', $member->id)->count());
+        $this->assertSame(2, $registration->adults_count);
+        $this->assertSame(2, $registration->children_count);
+        $this->assertSame([5, 8], $registration->child_ages);
+        $this->assertSame(2, $registration->room_count);
+        $this->assertSame(['double', 'quad'], $registration->room_types);
+        $firstSubmittedAt = $registration->submitted_at;
+
+        $this->actingAs($member, 'member')
+            ->postJson('/member/trip-registration', [
+                'adults_count' => 1,
+                'children_count' => 1,
+                'child_ages' => [6],
+                'room_count' => 1,
+                'room_types' => ['six'],
+            ])
+            ->assertOk();
+
+        $registration->refresh();
+
+        $this->assertSame(1, TripRegistration::query()->where('user_id', $member->id)->count());
+        $this->assertSame(1, $registration->adults_count);
+        $this->assertSame([6], $registration->child_ages);
+        $this->assertSame(['six'], $registration->room_types);
+        $this->assertTrue($registration->submitted_at->greaterThanOrEqualTo($firstSubmittedAt));
+    }
+
+    public function test_trip_registration_requires_matching_child_ages_and_room_types(): void
+    {
+        $member = User::factory()->create(['is_admin' => false]);
+
+        $this->actingAs($member, 'member')
+            ->postJson('/member/trip-registration', [
+                'adults_count' => 2,
+                'children_count' => 2,
+                'child_ages' => [5],
+                'room_count' => 2,
+                'room_types' => ['double'],
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['child_ages', 'room_types']);
+
+        $this->assertDatabaseCount('trip_registrations', 0);
     }
 
     public function test_member_can_submit_transfer_class_shirt_order_once(): void

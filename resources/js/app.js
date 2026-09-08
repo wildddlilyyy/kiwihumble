@@ -221,4 +221,70 @@ window.classShirtOrderForm = function classShirtOrderForm(config) {
   };
 };
 
+window.tripRegistrationForm = function tripRegistrationForm(config) {
+  return {
+    adultsCount: Number(config.adultsCount ?? 0),
+    childrenCount: Number(config.childrenCount ?? 0),
+    childAges: (config.childAges ?? []).map((age) => Number(age)),
+    roomCount: Number(config.roomCount ?? 0),
+    roomTypes: [...(config.roomTypes ?? [])],
+    submittedAt: config.submittedAt ?? "",
+    status: "",
+    error: "",
+    isSaving: false,
+    roomTypeLabels: {
+      double: "雙人房（一大床）",
+      quad: "四人房（兩大床）",
+      six: "六人房（三大床）",
+    },
+    syncChildAges() {
+      const count = Math.max(0, Number(this.childrenCount || 0));
+      this.childAges = Array.from({ length: count }, (_, index) => this.childAges[index] ?? "");
+    },
+    syncRoomTypes() {
+      const count = Math.max(0, Number(this.roomCount || 0));
+      this.roomTypes = Array.from({ length: count }, (_, index) => this.roomTypes[index] ?? "double");
+    },
+    async submit() {
+      this.status = "";
+      this.error = "";
+      this.syncChildAges();
+      this.syncRoomTypes();
+
+      if (this.childAges.some((age) => age === "" || age === null || age === undefined)) {
+        this.error = "請填寫每位小孩的年齡。";
+        return;
+      }
+
+      this.isSaving = true;
+      const form = this.$refs.form;
+      const formData = new FormData(form);
+
+      try {
+        const response = await fetch(form.action, {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "X-Requested-With": "XMLHttpRequest",
+          },
+          body: formData,
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || Object.values(data.errors || {})[0]?.[0] || "登記送出失敗。" );
+        }
+
+        this.submittedAt = data.submitted_at;
+        this.status = data.status;
+      } catch (error) {
+        this.error = error.message;
+      } finally {
+        this.isSaving = false;
+      }
+    },
+  };
+};
+
 Alpine.start();

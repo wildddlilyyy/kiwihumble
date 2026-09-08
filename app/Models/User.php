@@ -45,4 +45,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(ClassShirtOrder::class);
     }
+
+    public function tripRegistration(): HasOne
+    {
+        return $this->hasOne(TripRegistration::class);
+    }
 }
