@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Backend\ClassShirtOrderExportController as BackendClassShirtOrderExportController;
 use App\Http\Controllers\Backend\DashboardController as BackendDashboardController;
 use App\Http\Controllers\Backend\MemberController as BackendMemberController;
+use App\Http\Controllers\Backend\TripRegistrationExportController as BackendTripRegistrationExportController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Member\ClassShirtOrderController as MemberClassShirtOrderController;
 use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
@@ -45,6 +46,7 @@ Route::middleware(['auth:backend', 'admin'])->prefix('backend')->name('backend.'
     Route::get('/', BackendDashboardController::class)->name('dashboard');
     Route::get('/shirts', [BackendDashboardController::class, 'shirts'])->name('shirts');
     Route::get('/trip', [BackendDashboardController::class, 'trip'])->name('trip');
+    Route::get('/trip/export', BackendTripRegistrationExportController::class)->name('trip.export');
     Route::post('/settings', [BackendDashboardController::class, 'update'])->name('settings.update');
     Route::get('/class-shirt-orders/export', BackendClassShirtOrderExportController::class)->name('class-shirt-orders.export');
     Route::get('/members', [BackendMemberController::class, 'index'])->name('members.index');

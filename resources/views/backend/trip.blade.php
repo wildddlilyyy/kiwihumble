@@ -7,7 +7,7 @@
         <header class="border-b bg-white">
             <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-4">
                 <div><p class="text-xs font-black uppercase tracking-[0.22em] text-kiwi-gold">Backend</p><h1 class="text-2xl font-black text-kiwi-ink">Trip Registrations</h1></div>
-                <div class="flex flex-wrap items-center gap-3">@include('backend.partials.navigation')<form method="POST" action="{{ route('backend.logout') }}">@csrf<button class="rounded-lg bg-kiwi-blue px-4 py-2 text-sm font-black text-white hover:bg-kiwi-ink" type="submit">Sign out</button></form></div>
+                <div class="flex flex-wrap items-center gap-3">@include('backend.partials.navigation')<a class="rounded-lg border border-kiwi-blue px-4 py-2 text-sm font-black text-kiwi-blue hover:bg-slate-100" href="{{ route('backend.trip.export') }}">Export Trip</a><form method="POST" action="{{ route('backend.logout') }}">@csrf<button class="rounded-lg bg-kiwi-blue px-4 py-2 text-sm font-black text-white hover:bg-kiwi-ink" type="submit">Sign out</button></form></div>
             </div>
         </header>
         <section class="mx-auto max-w-6xl space-y-6 px-6 py-8">
