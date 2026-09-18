@@ -11,6 +11,27 @@
             </div>
         </header>
         <section class="mx-auto max-w-6xl space-y-6 px-6 py-8">
+            <section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div class="rounded-xl bg-white p-5 shadow-sm ring-1 ring-black/5">
+                    <p class="text-sm font-bold text-slate-500">參加組數</p>
+                    <p class="mt-2 text-3xl font-black text-kiwi-ink">{{ $stats['groups'] }}</p>
+                    <p class="mt-1 text-xs font-bold text-slate-400">每位同學一組</p>
+                </div>
+                <div class="rounded-xl bg-white p-5 shadow-sm ring-1 ring-black/5">
+                    <p class="text-sm font-bold text-slate-500">大人總人數</p>
+                    <p class="mt-2 text-3xl font-black text-kiwi-ink">{{ $stats['adults'] }}</p>
+                </div>
+                <div class="rounded-xl bg-white p-5 shadow-sm ring-1 ring-black/5">
+                    <p class="text-sm font-bold text-slate-500">小孩總人數</p>
+                    <p class="mt-2 text-3xl font-black text-kiwi-ink">{{ $stats['children'] }}</p>
+                    <p class="mt-1 text-xs font-bold text-slate-500">0-6Y：{{ $stats['children_0_6'] }}　7-12Y：{{ $stats['children_7_12'] }}</p>
+                </div>
+                <div class="rounded-xl bg-white p-5 shadow-sm ring-1 ring-black/5">
+                    <p class="text-sm font-bold text-slate-500">房間數</p>
+                    <p class="mt-2 text-3xl font-black text-kiwi-ink">{{ $stats['rooms_double'] + $stats['rooms_quad'] + $stats['rooms_six'] }}</p>
+                    <p class="mt-1 text-xs font-bold text-slate-500">雙人 {{ $stats['rooms_double'] }}　四人 {{ $stats['rooms_quad'] }}　六人 {{ $stats['rooms_six'] }}</p>
+                </div>
+            </section>
             <section class="overflow-x-auto rounded-xl bg-white p-6 shadow-sm ring-1 ring-black/5"><h2 class="text-xl font-black text-kiwi-ink">畢旅人數及房間登記</h2><table class="mt-6 w-full min-w-[980px] text-left text-sm"><thead class="bg-slate-50 text-xs uppercase tracking-wide text-slate-500"><tr><th class="px-4 py-3">NO.</th><th class="px-4 py-3">Name</th><th class="px-4 py-3">大人</th><th class="px-4 py-3">小孩</th><th class="px-4 py-3">小孩年齡</th><th class="px-4 py-3">房間</th><th class="px-4 py-3">房型</th><th class="px-4 py-3">送出時間</th></tr></thead><tbody class="divide-y divide-slate-200">
                 @forelse ($members as $member)
                     @php $registration = $member->tripRegistration; $childAges = collect($registration?->child_ages ?? [])->map(fn ($age) => $age.'Y')->join(', '); $roomTypes = collect($registration?->room_types ?? [])->map(fn ($type) => TripRegistration::roomTypeLabel($type))->join('、'); @endphp
