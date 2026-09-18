@@ -337,27 +337,23 @@
                                 <div>
                                     <h2 class="text-xl font-black text-kiwi-ink">班服訂購內容</h2>
                                     <p class="mt-1 text-sm font-bold text-slate-500" x-show="submittedAt">
-                                        訂單已送出，如需修改訂購內容請聯繫管理者。
+                                        已送出訂單仍可隨時修改，重新送出後會更新資料與時間。
                                     </p>
                                 </div>
 
-                                @if (! $classShirtOrder)
                                     <button
                                         class="grid size-11 place-items-center rounded-full bg-kiwi-blue text-2xl font-black text-white hover:bg-kiwi-ink"
                                         type="button"
                                         @click="addItem()"
-                                        x-show="! submittedAt"
                                     >
                                         +
                                     </button>
-                                @endif
                             </div>
 
                             <div class="mt-4 rounded-lg bg-emerald-50 p-3 text-sm font-bold text-emerald-700" x-show="status" x-text="status"></div>
                             <div class="mt-4 rounded-lg bg-red-50 p-3 text-sm font-bold text-red-700" x-show="error" x-text="error"></div>
 
-                            @if (! $classShirtOrder)
-                                <div class="mt-4 space-y-3" x-show="! submittedAt">
+                            <div class="mt-4 space-y-3">
                                     <template x-if="items.length === 0">
                                         <div class="rounded-lg bg-slate-50 p-6 text-center font-bold text-slate-500">
                                             尚未新增班服訂購內容。
@@ -401,8 +397,7 @@
                                             </button>
                                         </article>
                                     </template>
-                                </div>
-                            @endif
+                            </div>
 
                             <div class="mt-5 overflow-hidden rounded-xl border border-slate-200">
                                 <table class="w-full border-collapse text-left text-sm">
@@ -414,62 +409,32 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @if ($classShirtOrder)
-                                            @forelse ($classShirtOrder->items ?? [] as $item)
-                                                <tr>
-                                                    <td class="px-4 py-3 font-bold text-slate-800" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);">
-                                                        {{ ClassShirtOrder::categoryLabel($item['category'] ?? '') }}
-                                                    </td>
-                                                    <td class="px-4 py-3 text-slate-700" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);">
-                                                        {{ ClassShirtOrder::normalizeSize($item['size'] ?? '') }}
-                                                    </td>
-                                                    <td class="px-4 py-3 text-right text-slate-700" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);">
-                                                        {{ $item['quantity'] ?? 0 }}
-                                                    </td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td class="px-4 py-5 text-center font-bold text-slate-500" colspan="3" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);">
-                                                        尚未新增訂購內容。
-                                                    </td>
-                                                </tr>
-                                            @endforelse
-                                        @else
-                                            <template x-if="items.length === 0">
-                                                <tr>
-                                                    <td class="px-4 py-5 text-center font-bold text-slate-500" colspan="3" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);">
-                                                        尚未新增訂購內容。
-                                                    </td>
-                                                </tr>
-                                            </template>
-                                            <template x-for="(item, index) in items" :key="'summary-' + index">
-                                                <tr>
-                                                    <td class="px-4 py-3 font-bold text-slate-800" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);" x-text="categoryLabels[item.category] ?? item.category"></td>
-                                                    <td class="px-4 py-3 text-slate-700" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);" x-text="item.size"></td>
-                                                    <td class="px-4 py-3 text-right text-slate-700" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);" x-text="item.quantity"></td>
-                                                </tr>
-                                            </template>
-                                        @endif
+                                        <template x-if="items.length === 0">
+                                            <tr>
+                                                <td class="px-4 py-5 text-center font-bold text-slate-500" colspan="3" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);">
+                                                    尚未新增訂購內容。
+                                                </td>
+                                            </tr>
+                                        </template>
+                                        <template x-for="(item, index) in items" :key="'summary-' + index">
+                                            <tr>
+                                                <td class="px-4 py-3 font-bold text-slate-800" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);" x-text="categoryLabels[item.category] ?? item.category"></td>
+                                                <td class="px-4 py-3 text-slate-700" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);" x-text="item.size"></td>
+                                                <td class="px-4 py-3 text-right text-slate-700" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);" x-text="item.quantity"></td>
+                                            </tr>
+                                        </template>
                                     </tbody>
                                     <tfoot class="font-black text-kiwi-ink">
                                         <tr>
                                             <td class="px-4 py-3" colspan="2" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);">總件數</td>
                                             <td class="px-4 py-3 text-right" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);">
-                                                @if ($classShirtOrder)
-                                                    {{ $classShirtOrder->totalQuantity() }} 件
-                                                @else
-                                                    <span x-text="totalQuantity()"></span> 件
-                                                @endif
+                                                <span x-text="totalQuantity()"></span> 件
                                             </td>
                                         </tr>
                                         <tr>
                                             <td class="px-4 py-3" colspan="2" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);">總金額</td>
                                             <td class="px-4 py-3 text-right" style="border-bottom: 1px solid rgba(120, 140, 160, 0.35);">
-                                                @if ($classShirtOrder)
-                                                    NT$ {{ number_format($classShirtOrder->totalAmount()) }}
-                                                @else
-                                                    <span x-text="formatCurrency(totalAmount())"></span>
-                                                @endif
+                                                <span x-text="formatCurrency(totalAmount())"></span>
                                             </td>
                                         </tr>
                                     </tfoot>
@@ -491,7 +456,7 @@
                                 </div>
 
                                 <div class="rounded-xl border border-[#c9d3dd] bg-transparent p-5">
-                                    @if ($classShirtOrder)
+                                    @if (false)
                                         <form
                                             class="flex h-full flex-col"
                                             method="POST"
@@ -560,7 +525,7 @@
                                             </dl>
                                         </template>
 
-                                        <div class="space-y-4" x-show="! submittedAt">
+                                        <div class="space-y-4">
                                             <label class="block">
                                                 <span class="text-sm font-bold text-slate-700">付款方式</span>
                                                 <select class="mt-2 w-full rounded-lg border-slate-300 focus:border-kiwi-blue focus:ring-kiwi-blue" x-model="paymentMethod">
@@ -585,16 +550,14 @@
                                 </div>
                             </div>
 
-                            @if (! $classShirtOrder)
-                                <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" x-show="! submittedAt">
-                                    <p class="text-sm font-bold text-slate-500">完成送出後，前台不可自行修改訂購內容。</p>
+                            <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                    <p class="text-sm font-bold text-slate-500">目前仍在統計階段，送出後仍可隨時修改班服訂購內容。</p>
 
                                     <button class="rounded-lg bg-kiwi-blue px-5 py-3 text-sm font-black text-white hover:bg-kiwi-ink disabled:cursor-not-allowed disabled:opacity-60" type="button" @click="submit()" :disabled="isSaving">
                                         <span x-show="! isSaving">送出班服訂單</span>
                                         <span x-show="isSaving">送出中...</span>
                                     </button>
-                                </div>
-                            @endif
+                            </div>
                         </div>
                     </div>
 

@@ -12,22 +12,17 @@ class ClassShirtOrderController
 {
     public function store(Request $request): JsonResponse
     {
-        if ($request->user('member')->classShirtOrder()->exists()) {
-            return response()->json([
-                'message' => '班服訂單已送出，如需修改請聯繫管理者。',
-            ], 403);
-        }
-
         $items = $this->validateItems($request);
         $payment = $this->validatePayment($request);
+        $member = $request->user('member');
+        $existingOrder = $member->classShirtOrder;
 
-        $order = ClassShirtOrder::query()->create([
-            'user_id' => $request->user('member')->id,
+        $order = $member->classShirtOrder()->updateOrCreate([], [
             'items' => $items,
             'submitted_at' => now(),
             'payment_method' => $payment['payment_method'],
             'payment_account_last_five' => $payment['payment_account_last_five'],
-            'payment_status' => ClassShirtOrder::PAYMENT_STATUS_PENDING,
+            'payment_status' => $existingOrder?->payment_status ?? ClassShirtOrder::PAYMENT_STATUS_PENDING,
         ]);
 
         return response()->json([

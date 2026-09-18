@@ -186,7 +186,7 @@ class MemberAccessTest extends TestCase
         $this->assertDatabaseCount('trip_registrations', 0);
     }
 
-    public function test_member_can_submit_transfer_class_shirt_order_once(): void
+    public function test_member_can_resubmit_and_update_class_shirt_order(): void
     {
         $member = User::factory()->create(['is_admin' => false]);
 
@@ -227,11 +227,18 @@ class MemberAccessTest extends TestCase
                 ],
                 'payment_method' => 'cash',
             ])
-            ->assertForbidden();
+            ->assertOk()
+            ->assertJsonPath('items.0.size', 'XL')
+            ->assertJsonPath('total_quantity', 3);
 
         $this->actingAs($member, 'member')
             ->deleteJson('/member/class-shirt-order')
             ->assertForbidden();
+
+        $order->refresh();
+        $this->assertSame([
+            ['category' => 'adult', 'size' => 'XL', 'quantity' => 3],
+        ], $order->items);
     }
 
     public function test_member_can_submit_cash_class_shirt_order_without_last_five(): void
@@ -319,7 +326,7 @@ class MemberAccessTest extends TestCase
         ], $otherOrder->items);
     }
 
-    public function test_member_dashboard_shows_submitted_order_as_read_only(): void
+    public function test_member_dashboard_keeps_submitted_order_editable(): void
     {
         $member = User::factory()->create(['is_admin' => false]);
 
@@ -337,11 +344,11 @@ class MemberAccessTest extends TestCase
         $this->actingAs($member, 'member')
             ->get('/member?tab=class-shirt')
             ->assertOk()
-            ->assertSee('訂單已送出，如需修改訂購內容請聯繫管理者。')
-            ->assertSee('付款待確認')
+            ->assertSee('已送出訂單仍可隨時修改，重新送出後會更新資料與時間。')
+            ->assertSee('paymentStatusLabel')
             ->assertSee('40132')
-            ->assertDontSee('送出班服訂單')
-            ->assertDontSee('刪除');
+            ->assertSee('送出班服訂單')
+            ->assertSee('刪除');
     }
 
     public function test_member_can_update_submitted_order_payment_information(): void

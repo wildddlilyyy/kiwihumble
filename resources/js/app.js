@@ -167,11 +167,6 @@ window.classShirtOrderForm = function classShirtOrderForm(config) {
       this.status = "";
       this.error = "";
 
-      if (this.submittedAt) {
-        this.error = "班服訂單已送出，如需修改請聯繫管理者。";
-        return;
-      }
-
       if (this.items.length === 0) {
         this.error = "請至少新增一筆班服訂購內容。";
         return;
